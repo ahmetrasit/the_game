@@ -503,7 +503,7 @@ function App() {
       canvas.removeEventListener('click', handleMouseClick);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [gameStarted]); // Run when gameStarted changes so canvas exists
 
   const getDirectionFromRotation = (rotation) => {
     switch (rotation) {
