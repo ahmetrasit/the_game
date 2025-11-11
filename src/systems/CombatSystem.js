@@ -42,6 +42,10 @@ export class CombatSystem {
             if (health) {
               health.current -= combat.damage;
               if (health.current <= 0) {
+                // Check if player turret was destroyed
+                if (target.id === 't1') {
+                  state.setGameOver();
+                }
                 entitiesToRemove.push(target.id);
               }
             }

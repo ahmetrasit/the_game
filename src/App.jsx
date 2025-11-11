@@ -79,7 +79,7 @@ function App() {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const renderSystemRef = useRef(null);
-  const { resources, entities, gameTime, selectedBuilding, buildingRotation } = useGame();
+  const { resources, entities, gameTime, selectedBuilding, buildingRotation, gameOver } = useGame();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -137,7 +137,7 @@ function App() {
     const turret = new Entity('t1', 'building');
     turret.x = 25;
     turret.y = 25;
-    turret.add('Health', { current: 300, max: 300 });
+    turret.add('Health', { current: 250, max: 250 });
     turret.add('Combat', { damage: 25, range: 15, fireRate: 3, timer: 0 });
     turret.add('PlayerControlled', { angle: 0, rotationSpeed: 180 }); // 180 degrees per second
     turret.add('Equipment', {});
@@ -150,6 +150,14 @@ function App() {
     generator.add('Power', { production: 20, consumption: 0, connected: true });
     generator.add('Equipment', {});
     useGame.getState().spawn(generator);
+
+    const generator2 = new Entity('generator2', 'building');
+    generator2.x = 28;
+    generator2.y = 20;
+    generator2.add('Health', { current: 150, max: 150 });
+    generator2.add('Power', { production: 20, consumption: 0, connected: true });
+    generator2.add('Equipment', {});
+    useGame.getState().spawn(generator2);
 
     const refinery = new Entity('ironRefinery1', 'building');
     refinery.x = 22;
@@ -561,6 +569,55 @@ function App() {
           </div>
         </div>
       </div>
+
+      {gameOver && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#222',
+            border: '3px solid #ff4444',
+            padding: '40px',
+            borderRadius: '10px',
+            textAlign: 'center'
+          }}>
+            <h1 style={{ color: '#ff4444', fontSize: '48px', margin: '0 0 20px 0' }}>
+              GAME OVER
+            </h1>
+            <p style={{ color: '#fff', fontSize: '24px', margin: '0 0 10px 0' }}>
+              Your turret has been destroyed!
+            </p>
+            <p style={{ color: '#888', fontSize: '16px', margin: '0 0 30px 0' }}>
+              Survived {gameTime.toFixed(1)} seconds | Wave {gameRef.current?.getWaveNumber() || 0}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: '15px 30px',
+                fontSize: '18px',
+                backgroundColor: '#4ade80',
+                border: 'none',
+                borderRadius: '5px',
+                color: '#000',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontFamily: 'monospace'
+              }}
+            >
+              RESTART
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

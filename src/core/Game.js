@@ -13,6 +13,7 @@ export const useGame = create((set, get) => ({
   },
   grid: Array(50).fill().map(() => Array(50).fill(null)),
   isPaused: false,
+  gameOver: false,
   gameTime: 0,
   metrics: { curiosity: 0, perseverance: 0, events: [] },
   selectedBuilding: null,
@@ -57,6 +58,8 @@ export const useGame = create((set, get) => ({
   })),
 
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
+
+  setGameOver: () => set({ gameOver: true, isPaused: true }),
 
   selectBuilding: (type) => set({ selectedBuilding: type, buildingRotation: 0 }),
 
