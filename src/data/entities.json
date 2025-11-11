@@ -147,8 +147,9 @@
   },
   "carGarage": {
     "hp": 250,
-    "collectorCarSpeed": 3,
+    "collectorCarSpeed": 8,
     "collectorCarHP": 50,
+    "cargoCapacity": 5,
     "cost": {
       "ironPlates": 20,
       "gears": 10

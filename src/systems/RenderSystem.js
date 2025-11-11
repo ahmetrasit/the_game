@@ -171,14 +171,35 @@ export class RenderSystem {
           this.ctx.fill();
         }
 
-        // Draw indicator if carrying resources
-        if (carComp.carrying) {
-          this.ctx.fillStyle = '#00ff00';
-          this.ctx.shadowBlur = 6;
-          this.ctx.shadowColor = '#00ff00';
-          this.ctx.beginPath();
-          this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2 - size / 2 - 4, 4, 0, Math.PI * 2);
-          this.ctx.fill();
+        // Draw cargo indicator showing number of items
+        if (carComp.cargo && carComp.cargo.length > 0) {
+          const cargoCount = carComp.cargo.length;
+          const capacity = carComp.capacity || 5;
+
+          // Draw cargo bar above car
+          const barWidth = size * 0.8;
+          const barHeight = 3;
+          const barX = x + this.tileSize / 2 - barWidth / 2;
+          const barY = y + this.tileSize / 2 - size / 2 - 8;
+
+          // Background
+          this.ctx.fillStyle = '#333';
+          this.ctx.fillRect(barX, barY, barWidth, barHeight);
+
+          // Filled portion based on cargo
+          const fillRatio = cargoCount / capacity;
+          const fillColor = fillRatio >= 1 ? '#ff0000' : fillRatio >= 0.7 ? '#ffaa00' : '#00ff00';
+          this.ctx.fillStyle = fillColor;
+          this.ctx.fillRect(barX, barY, barWidth * fillRatio, barHeight);
+
+          // Draw cargo count number
+          this.ctx.fillStyle = '#ffffff';
+          this.ctx.font = `${size / 2}px monospace`;
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.shadowBlur = 3;
+          this.ctx.shadowColor = '#000000';
+          this.ctx.fillText(`${cargoCount}/${capacity}`, x + this.tileSize / 2, y + this.tileSize / 2);
           this.ctx.shadowBlur = 0;
         }
       }

@@ -47,8 +47,14 @@ export class CollectorCarSystem {
         const drop = state.entities.get(carComp.targetId);
         if (!drop) {
           // Resource was collected or disappeared
-          carComp.state = 'idle';
-          carComp.targetId = null;
+          // Check if cargo is full or no more drops nearby
+          if (carComp.cargo.length >= carComp.capacity) {
+            carComp.state = 'returning';
+            carComp.targetId = null;
+          } else {
+            carComp.state = 'idle';
+            carComp.targetId = null;
+          }
           return;
         }
 
@@ -61,13 +67,26 @@ export class CollectorCarSystem {
           // Pick up resource
           const dropComp = drop.get('ResourceDrop');
           if (dropComp) {
-            carComp.carrying = {
+            carComp.cargo.push({
               type: dropComp.resourceType,
               amount: dropComp.amount
-            };
+            });
             state.remove(drop.id);
-            carComp.state = 'returning';
             carComp.targetId = null;
+
+            // Check if cargo is full
+            if (carComp.cargo.length >= carComp.capacity) {
+              carComp.state = 'returning';
+            } else {
+              // Look for more nearby drops
+              const nextDrop = this.findNearestResourceDrop(car, state);
+              if (nextDrop) {
+                carComp.targetId = nextDrop.id;
+              } else {
+                // No more drops nearby, return with what we have
+                carComp.state = 'returning';
+              }
+            }
           }
         }
       } else if (carComp.state === 'returning') {
@@ -85,11 +104,11 @@ export class CollectorCarSystem {
         // Check if reached storage
         const dist = Math.hypot(car.x - storage.x, car.y - storage.y);
         if (dist < 1.5) {
-          // Deposit resources
-          if (carComp.carrying) {
-            state.addResource(carComp.carrying.type, carComp.carrying.amount);
-            carComp.carrying = null;
-          }
+          // Deposit all resources
+          carComp.cargo.forEach(item => {
+            state.addResource(item.type, item.amount);
+          });
+          carComp.cargo = [];
           carComp.state = 'idle';
         }
       }
@@ -98,17 +117,26 @@ export class CollectorCarSystem {
 
   spawnCollectorCar(garage) {
     const state = useGame.getState();
+
+    // Get garage data from entities.json
+    const entitiesData = require('../data/entities.json');
+    const garageData = entitiesData.carGarage;
+
     const car = new Entity(`car_${garage.id}`, 'collectorCar');
     car.x = garage.x;
     car.y = garage.y;
 
-    car.add('Health', { current: 50, max: 50 });
+    car.add('Health', {
+      current: garageData.collectorCarHP,
+      max: garageData.collectorCarHP
+    });
     car.add('CollectorCar', {
       garageId: garage.id,
       state: 'idle', // idle, collecting, returning
       targetId: null,
-      carrying: null, // { type: 'iron', amount: 5 }
-      speed: 3
+      cargo: [], // Array of { type: 'iron', amount: 5 }
+      capacity: garageData.cargoCapacity || 5,
+      speed: garageData.collectorCarSpeed
     });
     car.add('Equipment', {});
 
