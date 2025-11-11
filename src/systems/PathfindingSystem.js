@@ -47,10 +47,14 @@ export class PathfindingSystem {
       closed.add(key);
 
       const directions = [
-        { x: 0, y: 1 },
-        { x: 1, y: 0 },
-        { x: 0, y: -1 },
-        { x: -1, y: 0 }
+        { x: 0, y: 1, cost: 1 },
+        { x: 1, y: 0, cost: 1 },
+        { x: 0, y: -1, cost: 1 },
+        { x: -1, y: 0, cost: 1 },
+        { x: 1, y: 1, cost: 1.414 },
+        { x: 1, y: -1, cost: 1.414 },
+        { x: -1, y: 1, cost: 1.414 },
+        { x: -1, y: -1, cost: 1.414 }
       ];
 
       directions.forEach(d => {
@@ -62,10 +66,10 @@ export class PathfindingSystem {
         const cellOccupant = grid[n.y][n.x];
         if (cellOccupant && state.entities.get(cellOccupant)?.type === 'building') return;
 
-        const g = cur.g + 1;
+        const g = cur.g + d.cost;
         const h = Math.abs(n.x - goal.x) + Math.abs(n.y - goal.y);
         n.g = g;
-        n.f = g + h;
+        n.f = g + h + Math.random() * 0.5;
 
         if (!open.find(o => o.x === n.x && o.y === n.y)) {
           cameFrom[nk] = cur;

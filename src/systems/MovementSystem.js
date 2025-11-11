@@ -7,8 +7,30 @@ export class MovementSystem {
     const claimedTiles = new Map();
 
     state.entities.forEach(e => {
-      const currentTile = `${Math.floor(e.x)},${Math.floor(e.y)}`;
-      claimedTiles.set(currentTile, e.id);
+      if (e.type !== 'enemy') return;
+      const cx = Math.floor(e.x);
+      const cy = Math.floor(e.y);
+      const tiles = [
+        `${cx},${cy}`,
+        `${cx + 1},${cy}`,
+        `${cx},${cy + 1}`,
+        `${cx + 1},${cy + 1}`
+      ];
+
+      const fx = e.x - cx;
+      const fy = e.y - cy;
+
+      if (fx < 0.3 && fy < 0.3) {
+        claimedTiles.set(`${cx},${cy}`, e.id);
+      } else if (fx > 0.7 && fy < 0.3) {
+        claimedTiles.set(`${cx + 1},${cy}`, e.id);
+      } else if (fx < 0.3 && fy > 0.7) {
+        claimedTiles.set(`${cx},${cy + 1}`, e.id);
+      } else if (fx > 0.7 && fy > 0.7) {
+        claimedTiles.set(`${cx + 1},${cy + 1}`, e.id);
+      } else {
+        claimedTiles.set(`${cx},${cy}`, e.id);
+      }
     });
 
     state.entities.forEach(e => {
@@ -16,11 +38,15 @@ export class MovementSystem {
       if (!m?.path?.length) return;
 
       const next = m.path[0];
-      const dx = next.x - e.x;
-      const dy = next.y - e.y;
+      let dx = next.x - e.x;
+      let dy = next.y - e.y;
       const dist = Math.hypot(dx, dy);
 
-      if (dist < 0.1) {
+      if (!m.randomOffset) {
+        m.randomOffset = { x: (Math.random() - 0.5) * 0.3, y: (Math.random() - 0.5) * 0.3 };
+      }
+
+      if (dist < 0.15) {
         const tileKey = `${next.x},${next.y}`;
         const occupant = state.grid[next.y][next.x];
         const claimedBy = claimedTiles.get(tileKey);
@@ -44,14 +70,18 @@ export class MovementSystem {
         e.x = next.x;
         e.y = next.y;
         m.path.shift();
+        m.randomOffset = null;
 
         claimedTiles.set(tileKey, e.id);
         entitiesToUpdate.push({ entity: e, oldX, oldY });
       } else {
+        dx += m.randomOffset.x;
+        dy += m.randomOffset.y;
+        const randomDist = Math.hypot(dx, dy);
         const oldX = Math.floor(e.x);
         const oldY = Math.floor(e.y);
-        const newX = Math.floor(e.x + (dx / dist) * m.speed * dt);
-        const newY = Math.floor(e.y + (dy / dist) * m.speed * dt);
+        const newX = Math.floor(e.x + (dx / randomDist) * m.speed * dt);
+        const newY = Math.floor(e.y + (dy / randomDist) * m.speed * dt);
 
         if (newX !== oldX || newY !== oldY) {
           const tileKey = `${newX},${newY}`;
@@ -73,8 +103,8 @@ export class MovementSystem {
           }
         }
 
-        e.x += (dx / dist) * m.speed * dt;
-        e.y += (dy / dist) * m.speed * dt;
+        e.x += (dx / randomDist) * m.speed * dt;
+        e.y += (dy / randomDist) * m.speed * dt;
 
         const finalX = Math.floor(e.x);
         const finalY = Math.floor(e.y);
