@@ -5,6 +5,7 @@ import { PathfindingSystem } from './systems/PathfindingSystem';
 import { MovementSystem } from './systems/MovementSystem';
 import { WaveSystem } from './systems/WaveSystem';
 import { CombatSystem } from './systems/CombatSystem';
+import { ProjectileSystem } from './systems/ProjectileSystem';
 import { RenderSystem } from './systems/RenderSystem';
 
 class GameLoop {
@@ -15,6 +16,7 @@ class GameLoop {
       new PathfindingSystem(),
       new MovementSystem(),
       new CombatSystem(),
+      new ProjectileSystem(),
       new RenderSystem(canvas)
     ];
     this.delta = 0;
@@ -124,7 +126,7 @@ function App() {
     turret.x = 25;
     turret.y = 25;
     turret.add('Health', { current: 300, max: 300 });
-    turret.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
+    turret.add('Combat', { damage: 25, range: 15, fireRate: 3, timer: 0 });
     turret.add('Equipment', {});
     useGame.getState().spawn(turret);
   }, []);
