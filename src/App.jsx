@@ -147,7 +147,7 @@ function App() {
     generator.add('Equipment', {});
     useGame.getState().spawn(generator);
 
-    const refinery = new Entity('refinery1', 'building');
+    const refinery = new Entity('ironRefinery1', 'building');
     refinery.x = 22;
     refinery.y = 20;
     refinery.add('Health', { current: 200, max: 200 });
@@ -235,7 +235,7 @@ function App() {
           fireRate: buildingData.fireRate,
           timer: 0
         });
-      } else if (state.selectedBuilding === 'refinery' || state.selectedBuilding === 'copperRefinery' ||
+      } else if (state.selectedBuilding === 'ironRefinery' || state.selectedBuilding === 'copperRefinery' ||
                  state.selectedBuilding === 'assembler' || state.selectedBuilding === 'advancedAssembler') {
         entity.add('Production', {
           recipe: buildingData.recipe,
@@ -361,7 +361,7 @@ function App() {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {['turret', 'generator', 'storage', 'conveyor', 'refinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
+            {['turret', 'generator', 'storage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
               const data = entitiesData[type];
               if (!data) return null;
 
@@ -371,6 +371,7 @@ function App() {
               );
 
               const getDisplayName = (t) => {
+                if (t === 'ironRefinery') return 'IRON REFINERY';
                 if (t === 'copperRefinery') return 'COPPER REFINERY';
                 if (t === 'advancedAssembler') return 'ADV ASSEMBLER';
                 return t.toUpperCase();
@@ -405,7 +406,7 @@ function App() {
                       Dmg:{data.damage} Rng:{data.range} Rate:{data.fireRate}/s
                     </div>
                   )}
-                  {(type === 'refinery' || type === 'copperRefinery' || type === 'assembler' || type === 'advancedAssembler') && (
+                  {(type === 'ironRefinery' || type === 'copperRefinery' || type === 'assembler' || type === 'advancedAssembler') && (
                     <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
                       {data.recipe} | Pwr:{data.powerConsumption} | T:{data.productionTime}s
                     </div>

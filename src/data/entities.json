@@ -17,7 +17,7 @@
       "copper": 1
     }
   },
-  "refinery": {
+  "ironRefinery": {
     "hp": 200,
     "recipe": "ironPlates",
     "productionTime": 2,
