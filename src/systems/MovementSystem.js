@@ -1,37 +1,21 @@
 import { useGame } from '../core/Game';
 
 export class MovementSystem {
+  countNearbyEnemies(x, y, excludeId, entities, radius = 0.6) {
+    let count = 0;
+    entities.forEach(other => {
+      if (other.id === excludeId || other.type !== 'enemy') return;
+      const dx = other.x - x;
+      const dy = other.y - y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < radius) count++;
+    });
+    return count;
+  }
+
   update(dt) {
     const state = useGame.getState();
     const entitiesToUpdate = [];
-    const claimedTiles = new Map();
-
-    state.entities.forEach(e => {
-      if (e.type !== 'enemy') return;
-      const cx = Math.floor(e.x);
-      const cy = Math.floor(e.y);
-      const tiles = [
-        `${cx},${cy}`,
-        `${cx + 1},${cy}`,
-        `${cx},${cy + 1}`,
-        `${cx + 1},${cy + 1}`
-      ];
-
-      const fx = e.x - cx;
-      const fy = e.y - cy;
-
-      if (fx < 0.3 && fy < 0.3) {
-        claimedTiles.set(`${cx},${cy}`, e.id);
-      } else if (fx > 0.7 && fy < 0.3) {
-        claimedTiles.set(`${cx + 1},${cy}`, e.id);
-      } else if (fx < 0.3 && fy > 0.7) {
-        claimedTiles.set(`${cx},${cy + 1}`, e.id);
-      } else if (fx > 0.7 && fy > 0.7) {
-        claimedTiles.set(`${cx + 1},${cy + 1}`, e.id);
-      } else {
-        claimedTiles.set(`${cx},${cy}`, e.id);
-      }
-    });
 
     state.entities.forEach(e => {
       const m = e.get('Movement');
@@ -47,22 +31,17 @@ export class MovementSystem {
       }
 
       if (dist < 0.15) {
-        const tileKey = `${next.x},${next.y}`;
-        const occupant = state.grid[next.y][next.x];
-        const claimedBy = claimedTiles.get(tileKey);
-
+        const occupant = state.grid[next.y]?.[next.x];
         if (occupant && occupant !== e.id) {
           const occupantEntity = state.entities.get(occupant);
-          if (occupantEntity?.type === 'enemy') {
+          if (occupantEntity?.type === 'building') {
             return;
           }
         }
 
-        if (claimedBy && claimedBy !== e.id) {
-          const claimant = state.entities.get(claimedBy);
-          if (claimant?.type === 'enemy') {
-            return;
-          }
+        const nearbyCount = this.countNearbyEnemies(next.x, next.y, e.id, state.entities);
+        if (nearbyCount >= 5) {
+          return;
         }
 
         const oldX = Math.floor(e.x);
@@ -72,46 +51,40 @@ export class MovementSystem {
         m.path.shift();
         m.randomOffset = null;
 
-        claimedTiles.set(tileKey, e.id);
         entitiesToUpdate.push({ entity: e, oldX, oldY });
       } else {
         dx += m.randomOffset.x;
         dy += m.randomOffset.y;
         const randomDist = Math.hypot(dx, dy);
-        const oldX = Math.floor(e.x);
-        const oldY = Math.floor(e.y);
-        const newX = Math.floor(e.x + (dx / randomDist) * m.speed * dt);
-        const newY = Math.floor(e.y + (dy / randomDist) * m.speed * dt);
 
-        if (newX !== oldX || newY !== oldY) {
-          const tileKey = `${newX},${newY}`;
-          const occupant = state.grid[newY][newX];
-          const claimedBy = claimedTiles.get(tileKey);
+        const moveX = (dx / randomDist) * m.speed * dt;
+        const moveY = (dy / randomDist) * m.speed * dt;
+        const newPosX = e.x + moveX;
+        const newPosY = e.y + moveY;
 
-          if (occupant && occupant !== e.id) {
-            const occupantEntity = state.entities.get(occupant);
-            if (occupantEntity?.type === 'enemy') {
-              return;
-            }
-          }
-
-          if (claimedBy && claimedBy !== e.id) {
-            const claimant = state.entities.get(claimedBy);
-            if (claimant?.type === 'enemy') {
-              return;
-            }
+        const occupant = state.grid[Math.floor(newPosY)]?.[Math.floor(newPosX)];
+        if (occupant && occupant !== e.id) {
+          const occupantEntity = state.entities.get(occupant);
+          if (occupantEntity?.type === 'building') {
+            return;
           }
         }
 
-        e.x += (dx / randomDist) * m.speed * dt;
-        e.y += (dy / randomDist) * m.speed * dt;
+        const nearbyCount = this.countNearbyEnemies(newPosX, newPosY, e.id, state.entities);
+        if (nearbyCount >= 5) {
+          return;
+        }
+
+        const oldX = Math.floor(e.x);
+        const oldY = Math.floor(e.y);
+
+        e.x = newPosX;
+        e.y = newPosY;
 
         const finalX = Math.floor(e.x);
         const finalY = Math.floor(e.y);
 
         if (oldX !== finalX || oldY !== finalY) {
-          const finalKey = `${finalX},${finalY}`;
-          claimedTiles.set(finalKey, e.id);
           entitiesToUpdate.push({ entity: e, oldX, oldY });
         }
       }
