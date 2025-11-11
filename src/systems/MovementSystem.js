@@ -5,9 +5,22 @@ export class MovementSystem {
     let repulsionX = 0;
     let repulsionY = 0;
     let nearbyCount = 0;
+    let checked = 0;
+    const maxChecks = 20;
+
+    const ex = Math.floor(entity.x);
+    const ey = Math.floor(entity.y);
 
     entities.forEach(other => {
+      if (checked >= maxChecks) return;
       if (other.id === entity.id || other.type !== 'enemy') return;
+
+      const ox = Math.floor(other.x);
+      const oy = Math.floor(other.y);
+      const tileDist = Math.abs(ex - ox) + Math.abs(ey - oy);
+      if (tileDist > 2) return;
+
+      checked++;
 
       const dx = entity.x - other.x;
       const dy = entity.y - other.y;
@@ -32,8 +45,15 @@ export class MovementSystem {
   update(dt) {
     const state = useGame.getState();
     const entitiesToUpdate = [];
+    let processedCount = 0;
+    const maxProcessed = 100;
+
+    if (!this.repulsionFrame) this.repulsionFrame = 0;
+    this.repulsionFrame++;
 
     state.entities.forEach(e => {
+      if (processedCount >= maxProcessed) return;
+      processedCount++;
       const m = e.get('Movement');
       if (!m?.path?.length) return;
 
@@ -61,7 +81,14 @@ export class MovementSystem {
         m.randomOffset = { x: (Math.random() - 0.5) * 0.3, y: (Math.random() - 0.5) * 0.3 };
       }
 
-      const repulsion = this.calculateRepulsion(e, state.entities);
+      const shouldCalcRepulsion = (this.repulsionFrame + parseInt(e.id.slice(-2), 10)) % 2 === 0;
+      const repulsion = shouldCalcRepulsion
+        ? this.calculateRepulsion(e, state.entities)
+        : (e._lastRepulsion || { x: 0, y: 0 });
+
+      if (shouldCalcRepulsion) {
+        e._lastRepulsion = repulsion;
+      }
 
       if (dist < 0.15) {
         const occupant = state.grid[next.y]?.[next.x];
