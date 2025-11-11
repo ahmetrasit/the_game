@@ -10,11 +10,31 @@ export class MovementSystem {
     const ey = Math.floor(entity.y);
 
     entities.forEach(other => {
-      if (other.id === entity.id || other.type !== 'enemy') return;
+      if (other.id === entity.id) return;
 
       const ox = Math.floor(other.x);
       const oy = Math.floor(other.y);
       const tileDist = Math.abs(ex - ox) + Math.abs(ey - oy);
+
+      // Strong repulsion from buildings (turrets)
+      if (other.type === 'building') {
+        if (tileDist <= 1) {
+          const dx = entity.x - other.x;
+          const dy = entity.y - other.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < 2.0 && dist > 0.01) {
+            const force = (2.0 - dist) / 2.0;
+            // 50x stronger force for turrets
+            separationX += (dx / dist) * force * 75;
+            separationY += (dy / dist) * force * 75;
+          }
+        }
+        return;
+      }
+
+      // Normal separation from other enemies
+      if (other.type !== 'enemy') return;
       if (tileDist > 2) return;
 
       const dx = entity.x - other.x;
