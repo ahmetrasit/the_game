@@ -8,6 +8,7 @@ export class CombatSystem {
 
   update(dt) {
     const state = useGame.getState();
+    const entitiesToRemove = [];
 
     state.entities.forEach(entity => {
       const combat = entity.get('Combat');
@@ -16,14 +17,29 @@ export class CombatSystem {
       combat.timer = (combat.timer || 0) + dt;
 
       if (combat.timer >= 1 / combat.fireRate) {
-        const target = this.findTarget(entity, combat.range);
-        if (target) {
-          // Spawn projectile
-          this.spawnProjectile(entity, target, combat.damage);
-          combat.timer = 0;
+        if (entity.type === 'building') {
+          const target = this.findEnemyTarget(entity, combat.range);
+          if (target) {
+            this.spawnProjectile(entity, target, combat.damage);
+            combat.timer = 0;
+          }
+        } else if (entity.type === 'enemy') {
+          const target = this.findBuildingTarget(entity, 1.5);
+          if (target) {
+            const health = target.get('Health');
+            if (health) {
+              health.current -= combat.damage;
+              if (health.current <= 0) {
+                entitiesToRemove.push(target.id);
+              }
+            }
+            combat.timer = 0;
+          }
         }
       }
     });
+
+    entitiesToRemove.forEach(id => state.remove(id));
   }
 
   spawnProjectile(source, target, damage) {
@@ -49,13 +65,34 @@ export class CombatSystem {
     state.spawn(projectile);
   }
 
-  findTarget(entity, range) {
+  findEnemyTarget(entity, range) {
     const state = useGame.getState();
     let closest = null;
     let minDistance = Infinity;
 
     state.entities.forEach(other => {
       if (other.type !== 'enemy') return;
+
+      const dx = entity.x - other.x;
+      const dy = entity.y - other.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= range && distance < minDistance) {
+        closest = other;
+        minDistance = distance;
+      }
+    });
+
+    return closest;
+  }
+
+  findBuildingTarget(entity, range) {
+    const state = useGame.getState();
+    let closest = null;
+    let minDistance = Infinity;
+
+    state.entities.forEach(other => {
+      if (other.type !== 'building' && other.type !== 'conveyor') return;
 
       const dx = entity.x - other.x;
       const dy = entity.y - other.y;

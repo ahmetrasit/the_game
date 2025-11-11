@@ -108,6 +108,7 @@ function App() {
         }
         e.add('Health', { current: 50, max: 50 });
         e.add('Movement', { speed: 2, target: { x: 25, y: 25 }, path: null });
+        e.add('Combat', { damage: 5, fireRate: 1, timer: 0 });
         e.add('Equipment', {});
         useGame.getState().spawn(e);
       }
@@ -361,7 +362,7 @@ function App() {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {['turret', 'generator', 'storage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
+            {['wall', 'turret', 'generator', 'storage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
               const data = entitiesData[type];
               if (!data) return null;
 

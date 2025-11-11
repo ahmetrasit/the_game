@@ -74,7 +74,9 @@ export class RenderSystem {
       const power = entity.get('Power');
       const isPowered = !power || power.connected;
 
-      if (entity.id.startsWith('ironRefinery')) {
+      if (entity.id.startsWith('wall')) {
+        this.ctx.fillStyle = '#666666';
+      } else if (entity.id.startsWith('ironRefinery')) {
         this.ctx.fillStyle = isPowered ? '#ff8800' : '#662200';
       } else if (entity.id.startsWith('copperRefinery')) {
         this.ctx.fillStyle = isPowered ? '#ff6600' : '#884400';
@@ -172,7 +174,9 @@ export class RenderSystem {
 
     this.ctx.globalAlpha = 0.5;
 
-    if (buildingType === 'turret') {
+    if (buildingType === 'wall') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#666666';
+    } else if (buildingType === 'turret') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#4444ff';
     } else if (buildingType === 'ironRefinery') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ff8800';

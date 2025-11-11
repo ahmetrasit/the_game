@@ -39,6 +39,7 @@ export class WaveSystem {
 
       e.add('Health', { current: 50, max: 50 });
       e.add('Movement', { speed: 2, target: { x: 25, y: 25 }, path: null });
+      e.add('Combat', { damage: 5, fireRate: 1, timer: 0 });
       e.add('Equipment', {});
 
       useGame.getState().spawn(e);

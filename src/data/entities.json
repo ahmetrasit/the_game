@@ -81,5 +81,11 @@
     "cost": {
       "iron": 5
     }
+  },
+  "wall": {
+    "hp": 500,
+    "cost": {
+      "ironPlates": 5
+    }
   }
 }
