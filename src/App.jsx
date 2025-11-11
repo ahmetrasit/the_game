@@ -393,7 +393,11 @@ function App() {
       }
 
       const buildingData = entitiesData[state.selectedBuilding];
-      if (!buildingData || !buildingData.cost) return;
+      console.log('[handleMouseClick] buildingData:', buildingData);
+      if (!buildingData || !buildingData.cost) {
+        console.log('[handleMouseClick] BLOCKED: no buildingData or cost');
+        return;
+      }
 
       // Apply cost multiplier from modifier
       const costMultiplier = state.activeModifier && modifiersData[state.activeModifier]?.effects?.costMultiplier || 1;
@@ -401,8 +405,12 @@ function App() {
       const canAfford = Object.entries(buildingData.cost).every(
         ([resource, amount]) => (state.resources[resource] || 0) >= Math.ceil(amount * costMultiplier)
       );
+      console.log('[handleMouseClick] canAfford:', canAfford, 'resources:', state.resources);
 
-      if (!canAfford) return;
+      if (!canAfford) {
+        console.log('[handleMouseClick] BLOCKED: cannot afford');
+        return;
+      }
 
       Object.entries(buildingData.cost).forEach(([resource, amount]) => {
         state.addResource(resource, -Math.ceil(amount * costMultiplier));
@@ -467,6 +475,7 @@ function App() {
       }
 
       state.spawn(entity);
+      console.log('[handleMouseClick] SUCCESS: placed', state.selectedBuilding, 'at', x, y);
     };
 
     const handleKeyDown = (e) => {
