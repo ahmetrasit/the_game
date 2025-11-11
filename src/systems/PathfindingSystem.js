@@ -29,7 +29,8 @@ export class PathfindingSystem {
       const cur = open.shift();
       const key = `${cur.x},${cur.y}`;
 
-      if (cur.x === goal.x && cur.y === goal.y) {
+      const distToGoal = Math.abs(cur.x - goal.x) + Math.abs(cur.y - goal.y);
+      if (distToGoal === 0 || distToGoal === 1) {
         const path = [];
         let current = cur;
         let currentKey = key;
