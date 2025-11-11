@@ -378,14 +378,19 @@ function App() {
 
     const handleMouseClick = (e) => {
       const state = useGame.getState();
+      console.log('[handleMouseClick] selectedBuilding:', state.selectedBuilding);
       if (!state.selectedBuilding) return;
 
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) / (canvas.width / 50));
       const y = Math.floor((e.clientY - rect.top) / (canvas.height / 50));
+      console.log('[handleMouseClick] coords:', x, y, 'grid value:', state.grid[y]?.[x]);
 
       if (x < 0 || x >= 50 || y < 0 || y >= 50) return;
-      if (state.grid[y][x] !== null) return;
+      if (state.grid[y][x] !== null) {
+        console.log('[handleMouseClick] tile occupied by:', state.grid[y][x]);
+        return;
+      }
 
       const buildingData = entitiesData[state.selectedBuilding];
       if (!buildingData || !buildingData.cost) return;
