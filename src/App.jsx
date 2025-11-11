@@ -156,407 +156,82 @@ function App() {
     renderSystemRef.current = game.systems[game.systems.length - 1];
     game.start();
 
-    // ========== COMPACT BALANCED 7x7 FACTORY (22,22) to (28,28) ========== //
+    // ========== MINIMAL 3x3 STARTER FACTORY (24,24) to (26,26) ========== //
 
-    // ROW 22 - Top with generators and turrets (7 buildings)
+    // ROW 24 - Top row: generator, turret, storage
     const generator1 = new Entity('generator1', 'building');
-    generator1.x = 22;
-    generator1.y = 22;
+    generator1.x = 24;
+    generator1.y = 24;
     generator1.add('Health', { current: 150, max: 150 });
     generator1.add('Power', { production: 20, consumption: 0, connected: true });
     generator1.add('Equipment', {});
     useGame.getState().spawn(generator1);
 
-    const laserTurret1 = new Entity('laserTurret1', 'building');
-    laserTurret1.x = 23;
-    laserTurret1.y = 22;
-    laserTurret1.add('Health', { current: 250, max: 250 });
-    laserTurret1.add('Combat', { damage: 5, range: 12, fireRate: 3, timer: 0 });
-    laserTurret1.add('Equipment', {});
-    useGame.getState().spawn(laserTurret1);
-
     const turret2 = new Entity('turret2', 'building');
-    turret2.x = 24;
-    turret2.y = 22;
+    turret2.x = 25;
+    turret2.y = 24;
     turret2.add('Health', { current: 300, max: 300 });
     turret2.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
     turret2.add('Equipment', {});
     useGame.getState().spawn(turret2);
 
+    const storage1 = new Entity('storage1', 'building');
+    storage1.x = 26;
+    storage1.y = 24;
+    storage1.add('Health', { current: 100, max: 100 });
+    storage1.add('Equipment', {});
+    useGame.getState().spawn(storage1);
+
+    // ROW 25 - Middle row: turret, player turret (t1), drone bay
+    const turret3 = new Entity('turret3', 'building');
+    turret3.x = 24;
+    turret3.y = 25;
+    turret3.add('Health', { current: 300, max: 300 });
+    turret3.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
+    turret3.add('Equipment', {});
+    useGame.getState().spawn(turret3);
+
     const turret = new Entity('t1', 'building');
     turret.x = 25;
-    turret.y = 22;
+    turret.y = 25;
     turret.add('Health', { current: 250, max: 250 });
     turret.add('Combat', { damage: 25, range: 20, fireRate: 3, timer: 0 });
     turret.add('PlayerControlled', { angle: 0, rotationSpeed: 180 });
     turret.add('Equipment', {});
     useGame.getState().spawn(turret);
 
-    const turret3 = new Entity('turret3', 'building');
-    turret3.x = 26;
-    turret3.y = 22;
-    turret3.add('Health', { current: 300, max: 300 });
-    turret3.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
-    turret3.add('Equipment', {});
-    useGame.getState().spawn(turret3);
+    const droneBay1 = new Entity('droneBay1', 'building');
+    droneBay1.x = 26;
+    droneBay1.y = 25;
+    droneBay1.add('Health', { current: 300, max: 300 });
+    droneBay1.add('DroneBay', { productionTime: 15, productionProgress: 0 });
+    droneBay1.add('Equipment', {});
+    useGame.getState().spawn(droneBay1);
 
-    const laserTurret2 = new Entity('laserTurret2', 'building');
-    laserTurret2.x = 27;
-    laserTurret2.y = 22;
-    laserTurret2.add('Health', { current: 250, max: 250 });
-    laserTurret2.add('Combat', { damage: 5, range: 12, fireRate: 3, timer: 0 });
-    laserTurret2.add('Equipment', {});
-    useGame.getState().spawn(laserTurret2);
-
-    const generator2 = new Entity('generator2', 'building');
-    generator2.x = 28;
-    generator2.y = 22;
-    generator2.add('Health', { current: 150, max: 150 });
-    generator2.add('Power', { production: 20, consumption: 0, connected: true });
-    generator2.add('Equipment', {});
-    useGame.getState().spawn(generator2);
-
-    // ROW 23 - Production (7 buildings)
-    const machineGun1 = new Entity('machineGun1', 'building');
-    machineGun1.x = 22;
-    machineGun1.y = 23;
-    machineGun1.add('Health', { current: 280, max: 280 });
-    machineGun1.add('Combat', { damage: 3, range: 7, fireRate: 5, timer: 0 });
-    machineGun1.add('Equipment', {});
-    useGame.getState().spawn(machineGun1);
-
+    // ROW 26 - Bottom row: iron refinery, turret, car garage
     const ironRefinery1 = new Entity('ironRefinery1', 'building');
-    ironRefinery1.x = 23;
-    ironRefinery1.y = 23;
+    ironRefinery1.x = 24;
+    ironRefinery1.y = 26;
     ironRefinery1.add('Health', { current: 200, max: 200 });
     ironRefinery1.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
     ironRefinery1.add('Power', { production: 0, consumption: 5, connected: false });
     ironRefinery1.add('Equipment', {});
     useGame.getState().spawn(ironRefinery1);
 
-    const ironRefinery2 = new Entity('ironRefinery2', 'building');
-    ironRefinery2.x = 24;
-    ironRefinery2.y = 23;
-    ironRefinery2.add('Health', { current: 200, max: 200 });
-    ironRefinery2.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
-    ironRefinery2.add('Power', { production: 0, consumption: 5, connected: false });
-    ironRefinery2.add('Equipment', {});
-    useGame.getState().spawn(ironRefinery2);
-
-    const droneBay1 = new Entity('droneBay1', 'building');
-    droneBay1.x = 25;
-    droneBay1.y = 23;
-    droneBay1.add('Health', { current: 300, max: 300 });
-    droneBay1.add('DroneBay', { productionTime: 15, productionProgress: 0 });
-    droneBay1.add('Equipment', {});
-    useGame.getState().spawn(droneBay1);
-
-    const copperRefinery1 = new Entity('copperRefinery1', 'building');
-    copperRefinery1.x = 26;
-    copperRefinery1.y = 23;
-    copperRefinery1.add('Health', { current: 200, max: 200 });
-    copperRefinery1.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
-    copperRefinery1.add('Power', { production: 0, consumption: 5, connected: false });
-    copperRefinery1.add('Equipment', {});
-    useGame.getState().spawn(copperRefinery1);
-
-    const copperRefinery2 = new Entity('copperRefinery2', 'building');
-    copperRefinery2.x = 27;
-    copperRefinery2.y = 23;
-    copperRefinery2.add('Health', { current: 200, max: 200 });
-    copperRefinery2.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
-    copperRefinery2.add('Power', { production: 0, consumption: 5, connected: false });
-    copperRefinery2.add('Equipment', {});
-    useGame.getState().spawn(copperRefinery2);
-
-    const machineGun2 = new Entity('machineGun2', 'building');
-    machineGun2.x = 28;
-    machineGun2.y = 23;
-    machineGun2.add('Health', { current: 280, max: 280 });
-    machineGun2.add('Combat', { damage: 3, range: 7, fireRate: 5, timer: 0 });
-    machineGun2.add('Equipment', {});
-    useGame.getState().spawn(machineGun2);
-
-    // ROW 24 - Production with conveyors (7 buildings)
-    const generator3 = new Entity('generator3', 'building');
-    generator3.x = 22;
-    generator3.y = 24;
-    generator3.add('Health', { current: 150, max: 150 });
-    generator3.add('Power', { production: 20, consumption: 0, connected: true });
-    generator3.add('Equipment', {});
-    useGame.getState().spawn(generator3);
-
-    const ironRefinery3 = new Entity('ironRefinery3', 'building');
-    ironRefinery3.x = 23;
-    ironRefinery3.y = 24;
-    ironRefinery3.add('Health', { current: 200, max: 200 });
-    ironRefinery3.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
-    ironRefinery3.add('Power', { production: 0, consumption: 5, connected: false });
-    ironRefinery3.add('Equipment', {});
-    useGame.getState().spawn(ironRefinery3);
-
-    const conveyor1 = new Entity('conveyor1', 'conveyor');
-    conveyor1.x = 24;
-    conveyor1.y = 24;
-    conveyor1.add('Health', { current: 50, max: 50 });
-    conveyor1.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
-    conveyor1.add('Power', { production: 0, consumption: 1, connected: false });
-    conveyor1.add('Equipment', {});
-    useGame.getState().spawn(conveyor1);
-
-    const storage1 = new Entity('storage1', 'building');
-    storage1.x = 25;
-    storage1.y = 24;
-    storage1.add('Health', { current: 100, max: 100 });
-    storage1.add('Equipment', {});
-    useGame.getState().spawn(storage1);
-
-    const conveyor2 = new Entity('conveyor2', 'conveyor');
-    conveyor2.x = 26;
-    conveyor2.y = 24;
-    conveyor2.add('Health', { current: 50, max: 50 });
-    conveyor2.add('Conveyor', { items: [], speed: 1, dir: { x: -1, y: 0 } });
-    conveyor2.add('Power', { production: 0, consumption: 1, connected: false });
-    conveyor2.add('Equipment', {});
-    useGame.getState().spawn(conveyor2);
-
-    const advancedAssembler1 = new Entity('advancedAssembler1', 'building');
-    advancedAssembler1.x = 27;
-    advancedAssembler1.y = 24;
-    advancedAssembler1.add('Health', { current: 300, max: 300 });
-    advancedAssembler1.add('Production', { recipe: 'circuits', time: 3, progress: 0 });
-    advancedAssembler1.add('Power', { production: 0, consumption: 15, connected: false });
-    advancedAssembler1.add('Equipment', {});
-    useGame.getState().spawn(advancedAssembler1);
-
-    const generator4 = new Entity('generator4', 'building');
-    generator4.x = 28;
-    generator4.y = 24;
-    generator4.add('Health', { current: 150, max: 150 });
-    generator4.add('Power', { production: 20, consumption: 0, connected: true });
-    generator4.add('Equipment', {});
-    useGame.getState().spawn(generator4);
-
-    // ROW 25 - Support and storage (7 buildings)
-    const cannon1 = new Entity('cannon1', 'building');
-    cannon1.x = 22;
-    cannon1.y = 25;
-    cannon1.add('Health', { current: 400, max: 400 });
-    cannon1.add('Combat', { damage: 40, range: 6, fireRate: 0.5, timer: 0 });
-    cannon1.add('Equipment', {});
-    useGame.getState().spawn(cannon1);
-
-    const assembler1 = new Entity('assembler1', 'building');
-    assembler1.x = 23;
-    assembler1.y = 25;
-    assembler1.add('Health', { current: 250, max: 250 });
-    assembler1.add('Production', { recipe: 'gears', time: 1, progress: 0 });
-    assembler1.add('Power', { production: 0, consumption: 10, connected: false });
-    assembler1.add('Equipment', {});
-    useGame.getState().spawn(assembler1);
-
-    const carGarage1 = new Entity('carGarage1', 'building');
-    carGarage1.x = 24;
-    carGarage1.y = 25;
-    carGarage1.add('Health', { current: 250, max: 250 });
-    carGarage1.add('Equipment', {});
-    useGame.getState().spawn(carGarage1);
-
-    const storage2 = new Entity('storage2', 'building');
-    storage2.x = 25;
-    storage2.y = 25;
-    storage2.add('Health', { current: 100, max: 100 });
-    storage2.add('Equipment', {});
-    useGame.getState().spawn(storage2);
-
-    const carGarage2 = new Entity('carGarage2', 'building');
-    carGarage2.x = 26;
-    carGarage2.y = 25;
-    carGarage2.add('Health', { current: 250, max: 250 });
-    carGarage2.add('Equipment', {});
-    useGame.getState().spawn(carGarage2);
-
-    const assembler2 = new Entity('assembler2', 'building');
-    assembler2.x = 27;
-    assembler2.y = 25;
-    assembler2.add('Health', { current: 250, max: 250 });
-    assembler2.add('Production', { recipe: 'gears', time: 1, progress: 0 });
-    assembler2.add('Power', { production: 0, consumption: 10, connected: false });
-    assembler2.add('Equipment', {});
-    useGame.getState().spawn(assembler2);
-
-    const cannon2 = new Entity('cannon2', 'building');
-    cannon2.x = 28;
-    cannon2.y = 25;
-    cannon2.add('Health', { current: 400, max: 400 });
-    cannon2.add('Combat', { damage: 40, range: 6, fireRate: 0.5, timer: 0 });
-    cannon2.add('Equipment', {});
-    useGame.getState().spawn(cannon2);
-
-    // ROW 26 - More production (7 buildings)
-    const sniperTurret1 = new Entity('sniperTurret1', 'building');
-    sniperTurret1.x = 22;
-    sniperTurret1.y = 26;
-    sniperTurret1.add('Health', { current: 200, max: 200 });
-    sniperTurret1.add('Combat', { damage: 50, range: 15, fireRate: 0.33, timer: 0 });
-    sniperTurret1.add('Equipment', {});
-    useGame.getState().spawn(sniperTurret1);
-
-    const droneBay2 = new Entity('droneBay2', 'building');
-    droneBay2.x = 23;
-    droneBay2.y = 26;
-    droneBay2.add('Health', { current: 300, max: 300 });
-    droneBay2.add('DroneBay', { productionTime: 15, productionProgress: 0 });
-    droneBay2.add('Equipment', {});
-    useGame.getState().spawn(droneBay2);
-
-    const conveyor3 = new Entity('conveyor3', 'conveyor');
-    conveyor3.x = 24;
-    conveyor3.y = 26;
-    conveyor3.add('Health', { current: 50, max: 50 });
-    conveyor3.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } });
-    conveyor3.add('Power', { production: 0, consumption: 1, connected: false });
-    conveyor3.add('Equipment', {});
-    useGame.getState().spawn(conveyor3);
-
-    const storage3 = new Entity('storage3', 'building');
-    storage3.x = 25;
-    storage3.y = 26;
-    storage3.add('Health', { current: 100, max: 100 });
-    storage3.add('Equipment', {});
-    useGame.getState().spawn(storage3);
-
-    const conveyor4 = new Entity('conveyor4', 'conveyor');
-    conveyor4.x = 26;
-    conveyor4.y = 26;
-    conveyor4.add('Health', { current: 50, max: 50 });
-    conveyor4.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } });
-    conveyor4.add('Power', { production: 0, consumption: 1, connected: false });
-    conveyor4.add('Equipment', {});
-    useGame.getState().spawn(conveyor4);
-
-    const droneBay3 = new Entity('droneBay3', 'building');
-    droneBay3.x = 27;
-    droneBay3.y = 26;
-    droneBay3.add('Health', { current: 300, max: 300 });
-    droneBay3.add('DroneBay', { productionTime: 15, productionProgress: 0 });
-    droneBay3.add('Equipment', {});
-    useGame.getState().spawn(droneBay3);
-
-    const sniperTurret2 = new Entity('sniperTurret2', 'building');
-    sniperTurret2.x = 28;
-    sniperTurret2.y = 26;
-    sniperTurret2.add('Health', { current: 200, max: 200 });
-    sniperTurret2.add('Combat', { damage: 50, range: 15, fireRate: 0.33, timer: 0 });
-    sniperTurret2.add('Equipment', {});
-    useGame.getState().spawn(sniperTurret2);
-
-    // ROW 27 - Bottom turrets (7 buildings)
-    const laserTurret3 = new Entity('laserTurret3', 'building');
-    laserTurret3.x = 22;
-    laserTurret3.y = 27;
-    laserTurret3.add('Health', { current: 250, max: 250 });
-    laserTurret3.add('Combat', { damage: 5, range: 12, fireRate: 3, timer: 0 });
-    laserTurret3.add('Equipment', {});
-    useGame.getState().spawn(laserTurret3);
-
     const turret4 = new Entity('turret4', 'building');
-    turret4.x = 23;
-    turret4.y = 27;
+    turret4.x = 25;
+    turret4.y = 26;
     turret4.add('Health', { current: 300, max: 300 });
     turret4.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
     turret4.add('Equipment', {});
     useGame.getState().spawn(turret4);
 
-    const turret5 = new Entity('turret5', 'building');
-    turret5.x = 24;
-    turret5.y = 27;
-    turret5.add('Health', { current: 300, max: 300 });
-    turret5.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
-    turret5.add('Equipment', {});
-    useGame.getState().spawn(turret5);
-
-    const turret6 = new Entity('turret6', 'building');
-    turret6.x = 25;
-    turret6.y = 27;
-    turret6.add('Health', { current: 300, max: 300 });
-    turret6.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
-    turret6.add('Equipment', {});
-    useGame.getState().spawn(turret6);
-
-    const turret7 = new Entity('turret7', 'building');
-    turret7.x = 26;
-    turret7.y = 27;
-    turret7.add('Health', { current: 300, max: 300 });
-    turret7.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
-    turret7.add('Equipment', {});
-    useGame.getState().spawn(turret7);
-
-    const turret8 = new Entity('turret8', 'building');
-    turret8.x = 27;
-    turret8.y = 27;
-    turret8.add('Health', { current: 300, max: 300 });
-    turret8.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
-    turret8.add('Equipment', {});
-    useGame.getState().spawn(turret8);
-
-    const laserTurret4 = new Entity('laserTurret4', 'building');
-    laserTurret4.x = 28;
-    laserTurret4.y = 27;
-    laserTurret4.add('Health', { current: 250, max: 250 });
-    laserTurret4.add('Combat', { damage: 5, range: 12, fireRate: 3, timer: 0 });
-    laserTurret4.add('Equipment', {});
-    useGame.getState().spawn(laserTurret4);
-
-    // ROW 28 - Walls (7 buildings)
-    const wall1 = new Entity('wall1', 'building');
-    wall1.x = 22;
-    wall1.y = 28;
-    wall1.add('Health', { current: 500, max: 500 });
-    wall1.add('Equipment', {});
-    useGame.getState().spawn(wall1);
-
-    const wall2 = new Entity('wall2', 'building');
-    wall2.x = 23;
-    wall2.y = 28;
-    wall2.add('Health', { current: 500, max: 500 });
-    wall2.add('Equipment', {});
-    useGame.getState().spawn(wall2);
-
-    const wall3 = new Entity('wall3', 'building');
-    wall3.x = 24;
-    wall3.y = 28;
-    wall3.add('Health', { current: 500, max: 500 });
-    wall3.add('Equipment', {});
-    useGame.getState().spawn(wall3);
-
-    const wall4 = new Entity('wall4', 'building');
-    wall4.x = 25;
-    wall4.y = 28;
-    wall4.add('Health', { current: 500, max: 500 });
-    wall4.add('Equipment', {});
-    useGame.getState().spawn(wall4);
-
-    const wall5 = new Entity('wall5', 'building');
-    wall5.x = 26;
-    wall5.y = 28;
-    wall5.add('Health', { current: 500, max: 500 });
-    wall5.add('Equipment', {});
-    useGame.getState().spawn(wall5);
-
-    const wall6 = new Entity('wall6', 'building');
-    wall6.x = 27;
-    wall6.y = 28;
-    wall6.add('Health', { current: 500, max: 500 });
-    wall6.add('Equipment', {});
-    useGame.getState().spawn(wall6);
-
-    const wall7 = new Entity('wall7', 'building');
-    wall7.x = 28;
-    wall7.y = 28;
-    wall7.add('Health', { current: 500, max: 500 });
-    wall7.add('Equipment', {});
-    useGame.getState().spawn(wall7);
+    const carGarage1 = new Entity('carGarage1', 'building');
+    carGarage1.x = 26;
+    carGarage1.y = 26;
+    carGarage1.add('Health', { current: 250, max: 250 });
+    carGarage1.add('Equipment', {});
+    useGame.getState().spawn(carGarage1);
 
   }, [gameStarted]);
 
