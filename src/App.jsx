@@ -12,6 +12,7 @@ import { PowerSystem } from './systems/PowerSystem';
 import { PlayerControlSystem } from './systems/PlayerControlSystem';
 import { RepairSystem } from './systems/RepairSystem';
 import { DroneSystem } from './systems/DroneSystem';
+import { UpgradeSystem } from './systems/UpgradeSystem';
 import { RenderSystem } from './systems/RenderSystem';
 import entitiesData from './data/entities.json';
 
@@ -30,6 +31,7 @@ class GameLoop {
       new PlayerControlSystem(),
       new RepairSystem(),
       new DroneSystem(),
+      new UpgradeSystem(),
       new RenderSystem(canvas)
     ];
     this.delta = 0;
@@ -83,7 +85,7 @@ function App() {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const renderSystemRef = useRef(null);
-  const { resources, entities, gameTime, selectedBuilding, buildingRotation, gameOver } = useGame();
+  const { resources, entities, gameTime, selectedBuilding, buildingRotation, gameOver, showUpgradeCards, rangeModifier, damageBonus, enemySpeedModifier } = useGame();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -591,6 +593,112 @@ function App() {
           </div>
         </div>
       </div>
+
+      {showUpgradeCards && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: '#222',
+            border: '3px solid #4ade80',
+            padding: '40px',
+            borderRadius: '10px',
+            textAlign: 'center'
+          }}>
+            <h1 style={{ color: '#4ade80', fontSize: '42px', margin: '0 0 15px 0' }}>
+              CHOOSE AN UPGRADE
+            </h1>
+            <p style={{ color: '#888', fontSize: '14px', margin: '0 0 30px 0' }}>
+              Current bonuses: Range +{((rangeModifier - 1) * 100).toFixed(0)}% | Damage +{damageBonus} | Enemy Speed {((1 - enemySpeedModifier) * 100).toFixed(0)}% slower
+            </p>
+            <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+              <button
+                onClick={() => useGame.getState().applyUpgrade('range')}
+                style={{
+                  padding: '30px',
+                  backgroundColor: '#1a1a1a',
+                  border: '2px solid #4ade80',
+                  borderRadius: '10px',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                  width: '200px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#2a2a2a'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#1a1a1a'}
+              >
+                <div style={{ fontSize: '32px', marginBottom: '10px' }}>🎯</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '5px', color: '#4ade80' }}>
+                  +5% RANGE
+                </div>
+                <div style={{ fontSize: '12px', color: '#888' }}>
+                  Increase all turret ranges by 5%
+                </div>
+              </button>
+
+              <button
+                onClick={() => useGame.getState().applyUpgrade('damage')}
+                style={{
+                  padding: '30px',
+                  backgroundColor: '#1a1a1a',
+                  border: '2px solid #ff6b6b',
+                  borderRadius: '10px',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                  width: '200px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#2a2a2a'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#1a1a1a'}
+              >
+                <div style={{ fontSize: '32px', marginBottom: '10px' }}>⚡</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '5px', color: '#ff6b6b' }}>
+                  +10 DAMAGE
+                </div>
+                <div style={{ fontSize: '12px', color: '#888' }}>
+                  Increase all turret damage by 10
+                </div>
+              </button>
+
+              <button
+                onClick={() => useGame.getState().applyUpgrade('enemySpeed')}
+                style={{
+                  padding: '30px',
+                  backgroundColor: '#1a1a1a',
+                  border: '2px solid #4dabf7',
+                  borderRadius: '10px',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                  width: '200px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#2a2a2a'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#1a1a1a'}
+              >
+                <div style={{ fontSize: '32px', marginBottom: '10px' }}>🐌</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '5px', color: '#4dabf7' }}>
+                  -15% ENEMY SPEED
+                </div>
+                <div style={{ fontSize: '12px', color: '#888' }}>
+                  Slow down all enemies by 15%
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {gameOver && (
         <div style={{

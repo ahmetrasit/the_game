@@ -20,6 +20,13 @@ export const useGame = create((set, get) => ({
   buildingRotation: 0,
   nextEntityId: 0,
 
+  // Upgrade modifiers
+  rangeModifier: 1.0, // +5% per upgrade
+  damageBonus: 0, // +10 per upgrade
+  enemySpeedModifier: 1.0, // -15% per upgrade (0.85)
+
+  showUpgradeCards: false,
+
   spawn: (entity) => set((state) => {
     const newEntities = new Map(state.entities);
     newEntities.set(entity.id, entity);
@@ -72,5 +79,26 @@ export const useGame = create((set, get) => ({
     const id = state.nextEntityId;
     set({ nextEntityId: id + 1 });
     return id;
-  }
+  },
+
+  setShowUpgradeCards: (show) => set({ showUpgradeCards: show }),
+
+  applyUpgrade: (type) => set((state) => {
+    const updates = { showUpgradeCards: false };
+
+    if (type === 'range') {
+      updates.rangeModifier = state.rangeModifier * 1.05; // +5%
+    } else if (type === 'damage') {
+      updates.damageBonus = state.damageBonus + 10;
+    } else if (type === 'enemySpeed') {
+      updates.enemySpeedModifier = state.enemySpeedModifier * 0.85; // -15%
+    }
+
+    // Unpause the game
+    if (state.isPaused) {
+      updates.isPaused = false;
+    }
+
+    return updates;
+  })
 }));

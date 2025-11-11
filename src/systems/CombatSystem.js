@@ -20,18 +20,22 @@ export class CombatSystem {
         if (entity.type === 'building') {
           const playerControlled = entity.get('PlayerControlled');
 
+          // Apply global modifiers to turret range and damage
+          const modifiedRange = combat.range * state.rangeModifier;
+          const modifiedDamage = combat.damage + state.damageBonus;
+
           if (playerControlled) {
             // Player-controlled turret: fire in the direction it's facing
-            const target = this.findTargetInDirection(entity, combat.range, playerControlled.angle);
+            const target = this.findTargetInDirection(entity, modifiedRange, playerControlled.angle);
             if (target) {
-              this.spawnProjectile(entity, target, combat.damage);
+              this.spawnProjectile(entity, target, modifiedDamage);
               combat.timer = 0;
             }
           } else {
             // Auto-targeting turret
-            const target = this.findEnemyTarget(entity, combat.range);
+            const target = this.findEnemyTarget(entity, modifiedRange);
             if (target) {
-              this.spawnProjectile(entity, target, combat.damage);
+              this.spawnProjectile(entity, target, modifiedDamage);
               combat.timer = 0;
             }
           }

@@ -225,7 +225,6 @@ export class RenderSystem {
     if (!health) return;
 
     const ratio = health.current / health.max;
-    if (ratio >= 1) return;
 
     const x = entity.x * this.tileSize;
     const y = entity.y * this.tileSize;
