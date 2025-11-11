@@ -326,6 +326,52 @@ function App() {
     wall2.add('Equipment', {});
     useGame.getState().spawn(wall2);
 
+    // ROW 28 - Conveyor network connecting production to storage
+    const conveyor1 = new Entity('conveyor1', 'conveyor');
+    conveyor1.x = 23;
+    conveyor1.y = 28;
+    conveyor1.add('Health', { current: 50, max: 50 });
+    conveyor1.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } });
+    conveyor1.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor1.add('Equipment', {});
+    useGame.getState().spawn(conveyor1);
+
+    const conveyor2 = new Entity('conveyor2', 'conveyor');
+    conveyor2.x = 24;
+    conveyor2.y = 28;
+    conveyor2.add('Health', { current: 50, max: 50 });
+    conveyor2.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
+    conveyor2.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor2.add('Equipment', {});
+    useGame.getState().spawn(conveyor2);
+
+    const conveyor3 = new Entity('conveyor3', 'conveyor');
+    conveyor3.x = 25;
+    conveyor3.y = 28;
+    conveyor3.add('Health', { current: 50, max: 50 });
+    conveyor3.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
+    conveyor3.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor3.add('Equipment', {});
+    useGame.getState().spawn(conveyor3);
+
+    const conveyor4 = new Entity('conveyor4', 'conveyor');
+    conveyor4.x = 26;
+    conveyor4.y = 28;
+    conveyor4.add('Health', { current: 50, max: 50 });
+    conveyor4.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } });
+    conveyor4.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor4.add('Equipment', {});
+    useGame.getState().spawn(conveyor4);
+
+    const conveyor5 = new Entity('conveyor5', 'conveyor');
+    conveyor5.x = 27;
+    conveyor5.y = 28;
+    conveyor5.add('Health', { current: 50, max: 50 });
+    conveyor5.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } });
+    conveyor5.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor5.add('Equipment', {});
+    useGame.getState().spawn(conveyor5);
+
   }, [gameStarted]);
 
   useEffect(() => {
