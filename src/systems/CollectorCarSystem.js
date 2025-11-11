@@ -5,14 +5,28 @@ import entitiesData from '../data/entities.json';
 export class CollectorCarSystem {
   constructor() {
     this.spawnedCars = new Set(); // Track which garages have spawned cars
+    this.respawnTimers = new Map(); // Track respawn timers for destroyed cars
   }
 
   update(dt) {
     const state = useGame.getState();
 
+    // Update respawn timers
+    this.respawnTimers.forEach((timer, garageId) => {
+      const newTimer = timer - dt;
+      if (newTimer <= 0) {
+        // Respawn time reached, remove timer and allow spawning
+        this.respawnTimers.delete(garageId);
+      } else {
+        this.respawnTimers.set(garageId, newTimer);
+      }
+    });
+
     // Spawn collector cars for each car garage
     state.entities.forEach(entity => {
-      if (entity.id.startsWith('carGarage') && !this.spawnedCars.has(entity.id)) {
+      if (entity.id.startsWith('carGarage') &&
+          !this.spawnedCars.has(entity.id) &&
+          !this.respawnTimers.has(entity.id)) {
         this.spawnCollectorCar(entity);
         this.spawnedCars.add(entity.id);
       }
@@ -25,12 +39,13 @@ export class CollectorCarSystem {
       const carComp = car.get('CollectorCar');
       if (!carComp) return;
 
-      // If car is destroyed, remove it and allow respawn from garage
+      // If car is destroyed, remove it and start respawn timer
       const health = car.get('Health');
       if (health && health.current <= 0) {
         const garage = state.entities.get(carComp.garageId);
         if (garage) {
           this.spawnedCars.delete(carComp.garageId);
+          this.respawnTimers.set(carComp.garageId, 3.0); // 3 second respawn timer
         }
         state.remove(car.id);
         return;

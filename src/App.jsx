@@ -156,9 +156,17 @@ function App() {
     renderSystemRef.current = game.systems[game.systems.length - 1];
     game.start();
 
-    // ========== MINIMAL 3x5 STARTER FACTORY (24,24) to (28,26) ========== //
+    // ========== EXPANDED 5x5 STARTER FACTORY (23,24) to (28,27) ========== //
 
-    // ROW 24 - Top row: generator, gear assembler, storage
+    // ROW 24 - Top row: sniper, generator, gear assembler, storage, cannon
+    const sniperTurret1 = new Entity('sniperTurret1', 'building');
+    sniperTurret1.x = 23;
+    sniperTurret1.y = 24;
+    sniperTurret1.add('Health', { current: 200, max: 200 });
+    sniperTurret1.add('Combat', { damage: 50, range: 15, fireRate: 0.33, timer: 0 });
+    sniperTurret1.add('Equipment', {});
+    useGame.getState().spawn(sniperTurret1);
+
     const generator1 = new Entity('generator1', 'building');
     generator1.x = 24;
     generator1.y = 24;
@@ -183,7 +191,24 @@ function App() {
     storage1.add('Equipment', {});
     useGame.getState().spawn(storage1);
 
-    // ROW 25 - Middle row: laser turret, player turret (t1), drone bay
+    const cannon1 = new Entity('cannon1', 'building');
+    cannon1.x = 27;
+    cannon1.y = 24;
+    cannon1.add('Health', { current: 400, max: 400 });
+    cannon1.add('Combat', { damage: 40, range: 6, fireRate: 0.5, timer: 0 });
+    cannon1.add('Equipment', {});
+    useGame.getState().spawn(cannon1);
+
+    // ROW 25 - Middle row: iron refinery2, laser turret, player turret (t1), drone bay, iron refinery3
+    const ironRefinery2 = new Entity('ironRefinery2', 'building');
+    ironRefinery2.x = 23;
+    ironRefinery2.y = 25;
+    ironRefinery2.add('Health', { current: 200, max: 200 });
+    ironRefinery2.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
+    ironRefinery2.add('Power', { production: 0, consumption: 5, connected: false });
+    ironRefinery2.add('Equipment', {});
+    useGame.getState().spawn(ironRefinery2);
+
     const laserTurret1 = new Entity('laserTurret1', 'building');
     laserTurret1.x = 24;
     laserTurret1.y = 25;
@@ -209,7 +234,25 @@ function App() {
     droneBay1.add('Equipment', {});
     useGame.getState().spawn(droneBay1);
 
-    // ROW 26 - Production row: iron refinery, advanced assembler, car garage
+    const ironRefinery3 = new Entity('ironRefinery3', 'building');
+    ironRefinery3.x = 27;
+    ironRefinery3.y = 25;
+    ironRefinery3.add('Health', { current: 200, max: 200 });
+    ironRefinery3.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
+    ironRefinery3.add('Power', { production: 0, consumption: 5, connected: false });
+    ironRefinery3.add('Equipment', {});
+    useGame.getState().spawn(ironRefinery3);
+
+    // ROW 26 - Production row: copper refinery2, iron refinery, advanced assembler, car garage, laser turret2
+    const copperRefinery2 = new Entity('copperRefinery2', 'building');
+    copperRefinery2.x = 23;
+    copperRefinery2.y = 26;
+    copperRefinery2.add('Health', { current: 200, max: 200 });
+    copperRefinery2.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
+    copperRefinery2.add('Power', { production: 0, consumption: 5, connected: false });
+    copperRefinery2.add('Equipment', {});
+    useGame.getState().spawn(copperRefinery2);
+
     const ironRefinery1 = new Entity('ironRefinery1', 'building');
     ironRefinery1.x = 24;
     ironRefinery1.y = 26;
@@ -235,7 +278,22 @@ function App() {
     carGarage1.add('Equipment', {});
     useGame.getState().spawn(carGarage1);
 
-    // ROW 27 - Bottom row: generator2, copper refinery, turret
+    const laserTurret2 = new Entity('laserTurret2', 'building');
+    laserTurret2.x = 27;
+    laserTurret2.y = 26;
+    laserTurret2.add('Health', { current: 250, max: 250 });
+    laserTurret2.add('Combat', { damage: 5, range: 12, fireRate: 3, timer: 0 });
+    laserTurret2.add('Equipment', {});
+    useGame.getState().spawn(laserTurret2);
+
+    // ROW 27 - Bottom row: wall1, generator2, copper refinery, turret, wall2
+    const wall1 = new Entity('wall1', 'building');
+    wall1.x = 23;
+    wall1.y = 27;
+    wall1.add('Health', { current: 500, max: 500 });
+    wall1.add('Equipment', {});
+    useGame.getState().spawn(wall1);
+
     const generator2 = new Entity('generator2', 'building');
     generator2.x = 24;
     generator2.y = 27;
@@ -261,17 +319,9 @@ function App() {
     turret5.add('Equipment', {});
     useGame.getState().spawn(turret5);
 
-    // ROW 28 - Wall row: 2 walls for defense
-    const wall1 = new Entity('wall1', 'building');
-    wall1.x = 24;
-    wall1.y = 28;
-    wall1.add('Health', { current: 500, max: 500 });
-    wall1.add('Equipment', {});
-    useGame.getState().spawn(wall1);
-
     const wall2 = new Entity('wall2', 'building');
-    wall2.x = 26;
-    wall2.y = 28;
+    wall2.x = 27;
+    wall2.y = 27;
     wall2.add('Health', { current: 500, max: 500 });
     wall2.add('Equipment', {});
     useGame.getState().spawn(wall2);
