@@ -12,7 +12,24 @@ export class PathfindingSystem {
       if (!m || (m.path && m.path.length > 0)) return;
 
       count++;
-      m.path = this.astar({ x: Math.floor(e.x), y: Math.floor(e.y) }, m.target);
+
+      // Find nearest building to attack
+      let nearestBuilding = null;
+      let nearestDist = Infinity;
+
+      state.entities.forEach(b => {
+        if (b.type === 'building') {
+          const dist = Math.hypot(b.x - e.x, b.y - e.y);
+          if (dist < nearestDist) {
+            nearestDist = dist;
+            nearestBuilding = b;
+          }
+        }
+      });
+
+      // If found a building, path to it; otherwise use original target
+      const target = nearestBuilding ? { x: Math.floor(nearestBuilding.x), y: Math.floor(nearestBuilding.y) } : m.target;
+      m.path = this.astar({ x: Math.floor(e.x), y: Math.floor(e.y) }, target);
     });
   }
 
