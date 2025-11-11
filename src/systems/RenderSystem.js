@@ -76,6 +76,16 @@ export class RenderSystem {
 
       if (entity.id.startsWith('wall')) {
         this.ctx.fillStyle = '#666666';
+      } else if (entity.id.startsWith('laserTurret')) {
+        this.ctx.fillStyle = '#00ffff';
+      } else if (entity.id.startsWith('cannon')) {
+        this.ctx.fillStyle = '#8b4513';
+      } else if (entity.id.startsWith('sniperTurret')) {
+        this.ctx.fillStyle = '#9932cc';
+      } else if (entity.id.startsWith('machineGun')) {
+        this.ctx.fillStyle = '#ff6600';
+      } else if (entity.id.startsWith('turret')) {
+        this.ctx.fillStyle = '#4444ff';
       } else if (entity.id.startsWith('ironRefinery')) {
         this.ctx.fillStyle = isPowered ? '#ff8800' : '#662200';
       } else if (entity.id.startsWith('copperRefinery')) {
@@ -176,6 +186,14 @@ export class RenderSystem {
 
     if (buildingType === 'wall') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#666666';
+    } else if (buildingType === 'laserTurret') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#00ffff';
+    } else if (buildingType === 'cannon') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#8b4513';
+    } else if (buildingType === 'sniperTurret') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#9932cc';
+    } else if (buildingType === 'machineGun') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ff6600';
     } else if (buildingType === 'turret') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#4444ff';
     } else if (buildingType === 'ironRefinery') {

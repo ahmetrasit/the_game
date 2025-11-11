@@ -229,7 +229,7 @@ function App() {
       entity.add('Health', { current: buildingData.hp, max: buildingData.hp });
       entity.add('Equipment', {});
 
-      if (state.selectedBuilding === 'turret') {
+      if (buildingData.damage && buildingData.range && buildingData.fireRate) {
         entity.add('Combat', {
           damage: buildingData.damage,
           range: buildingData.range,
@@ -362,7 +362,7 @@ function App() {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {['wall', 'turret', 'generator', 'storage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
+            {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun', 'generator', 'storage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
               const data = entitiesData[type];
               if (!data) return null;
 

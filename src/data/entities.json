@@ -8,6 +8,49 @@
       "iron": 40
     }
   },
+  "laserTurret": {
+    "hp": 250,
+    "damage": 5,
+    "range": 12,
+    "fireRate": 3,
+    "cost": {
+      "ironPlates": 30,
+      "copperPlates": 20,
+      "circuits": 5
+    }
+  },
+  "cannon": {
+    "hp": 400,
+    "damage": 40,
+    "range": 6,
+    "fireRate": 0.5,
+    "cost": {
+      "ironPlates": 50,
+      "gears": 10
+    }
+  },
+  "sniperTurret": {
+    "hp": 200,
+    "damage": 50,
+    "range": 15,
+    "fireRate": 0.33,
+    "cost": {
+      "ironPlates": 40,
+      "circuits": 10,
+      "gears": 5
+    }
+  },
+  "machineGun": {
+    "hp": 280,
+    "damage": 3,
+    "range": 7,
+    "fireRate": 5,
+    "cost": {
+      "ironPlates": 35,
+      "copperPlates": 15,
+      "gears": 8
+    }
+  },
   "scout": {
     "hp": 50,
     "damage": 5,
