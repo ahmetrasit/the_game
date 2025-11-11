@@ -1,5 +1,6 @@
 import { useGame } from '../core/Game';
 import { Entity } from '../core/Entity';
+import entitiesData from '../data/entities.json';
 
 export class CollectorCarSystem {
   constructor() {
@@ -119,7 +120,6 @@ export class CollectorCarSystem {
     const state = useGame.getState();
 
     // Get garage data from entities.json
-    const entitiesData = require('../data/entities.json');
     const garageData = entitiesData.carGarage;
 
     const car = new Entity(`car_${garage.id}`, 'collectorCar');
