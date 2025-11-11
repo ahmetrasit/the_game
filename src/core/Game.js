@@ -109,7 +109,7 @@ export const useGame = create((set, get) => ({
   shuffleDeck: () => {
     const state = get();
     const shuffled = [...state.selectedDeck].sort(() => Math.random() - 0.5);
-    const handSize = Math.min(4, shuffled.length);
+    const handSize = Math.min(3, shuffled.length);
     set({ currentHand: shuffled.slice(0, handSize) });
   },
 

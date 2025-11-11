@@ -482,9 +482,12 @@ function App() {
     }
   };
 
-  // Deck selection state
-  const [tempDeck, setTempDeck] = React.useState(['wall', 'turret', 'laserTurret', 'generator', 'storage', 'conveyor', 'ironRefinery', 'droneBay']);
+  // Deck selection state - weapons only
+  const [tempDeck, setTempDeck] = React.useState(['wall', 'turret', 'laserTurret', 'cannon']);
   const [tempModifier, setTempModifier] = React.useState('normal');
+
+  // Infrastructure buildings are always available
+  const infrastructureBuildings = ['generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'];
 
   const handleStartGame = () => {
     useGame.getState().startGame(tempDeck, tempModifier);
@@ -512,14 +515,14 @@ function App() {
           maxHeight: '90vh',
           overflow: 'auto'
         }}>
-          <h1 style={{ color: '#4ade80', marginBottom: '20px' }}>BUILD YOUR DECK</h1>
+          <h1 style={{ color: '#4ade80', marginBottom: '20px' }}>SELECT YOUR ARSENAL</h1>
           <p style={{ color: '#888', marginBottom: '30px' }}>
-            Select 6-10 building types to use in this run. Your deck shuffles every 30s, revealing 4 random buildings.
+            Choose 3-6 weapon types for this run. Your deck shuffles every 30s, revealing 3 random weapons. Infrastructure buildings are always available.
           </p>
 
-          <h3 style={{ color: '#fff', marginBottom: '15px' }}>Select Buildings ({tempDeck.length}/10)</h3>
+          <h3 style={{ color: '#fff', marginBottom: '15px' }}>Select Weapons ({tempDeck.length}/6)</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '30px' }}>
-            {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun', 'generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler'].map(type => {
+            {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun'].map(type => {
               const isSelected = tempDeck.includes(type);
               return (
                 <button
@@ -527,7 +530,7 @@ function App() {
                   onClick={() => {
                     if (isSelected) {
                       setTempDeck(tempDeck.filter(t => t !== type));
-                    } else if (tempDeck.length < 10) {
+                    } else if (tempDeck.length < 6) {
                       setTempDeck([...tempDeck, type]);
                     }
                   }}
@@ -574,20 +577,20 @@ function App() {
 
           <button
             onClick={handleStartGame}
-            disabled={tempDeck.length < 6}
+            disabled={tempDeck.length < 3}
             style={{
               width: '100%',
               padding: '20px',
               fontSize: '20px',
               fontWeight: 'bold',
-              backgroundColor: tempDeck.length >= 6 ? '#4ade80' : '#555',
+              backgroundColor: tempDeck.length >= 3 ? '#4ade80' : '#555',
               border: 'none',
               borderRadius: '10px',
-              color: tempDeck.length >= 6 ? '#000' : '#888',
-              cursor: tempDeck.length >= 6 ? 'pointer' : 'not-allowed'
+              color: tempDeck.length >= 3 ? '#000' : '#888',
+              cursor: tempDeck.length >= 3 ? 'pointer' : 'not-allowed'
             }}
           >
-            START GAME {tempDeck.length >= 6 ? '' : `(Select at least 6 buildings)`}
+            START GAME {tempDeck.length >= 3 ? '' : `(Select at least 3 weapons)`}
           </button>
         </div>
       </div>
@@ -664,24 +667,86 @@ function App() {
             </div>
           )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {currentHand.map(type => {
-              const data = entitiesData[type];
-              if (!data) return null;
+          {/* Infrastructure Buildings */}
+          <div style={{ marginBottom: '15px' }}>
+            <h4 style={{ margin: '0 0 8px 0', color: '#888', fontSize: '11px', textTransform: 'uppercase' }}>Infrastructure</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {infrastructureBuildings.map(type => {
+                const data = entitiesData[type];
+                if (!data) return null;
 
-              const isSelected = selectedBuilding === type;
+                const isSelected = selectedBuilding === type;
+                const costMultiplier = activeModifier && modifiersData[activeModifier]?.effects?.costMultiplier || 1;
+                const canAfford = data.cost && Object.entries(data.cost).every(
+                  ([resource, amount]) => (resources[resource] || 0) >= Math.ceil(amount * costMultiplier)
+                );
+
+                const getDisplayName = (t) => {
+                  if (t === 'ironRefinery') return 'IRON REFINERY';
+                  if (t === 'copperRefinery') return 'COPPER REFINERY';
+                  if (t === 'advancedAssembler') return 'ADV ASSEMBLER';
+                  if (t === 'droneBay') return 'DRONE BAY';
+                  return t.toUpperCase();
+                };
+
+                return (
+                  <button
+                    key={type}
+                    onClick={() => useGame.getState().selectBuilding(type)}
+                    style={{
+                      padding: '8px',
+                      backgroundColor: isSelected ? '#444' : '#222',
+                      border: `2px solid ${isSelected ? '#4ade80' : canAfford ? '#444' : '#883333'}`,
+                      color: canAfford ? '#fff' : '#888',
+                      cursor: canAfford ? 'pointer' : 'not-allowed',
+                      textAlign: 'left',
+                      fontSize: '11px',
+                      fontFamily: 'monospace'
+                    }}
+                    disabled={!canAfford}
+                  >
+                    <div style={{ fontWeight: 'bold', marginBottom: '2px', fontSize: '12px' }}>
+                      {getDisplayName(type)}
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#888' }}>
+                      {data.cost ? Object.entries(data.cost)
+                        .map(([r, a]) => `${Math.ceil(a * costMultiplier)} ${r}`)
+                        .join(', ') : 'Free'}
+                    </div>
+                    {(type === 'ironRefinery' || type === 'copperRefinery' || type === 'assembler' || type === 'advancedAssembler') && (
+                      <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                        {data.recipe} | Pwr:{data.powerConsumption} | T:{data.productionTime}s
+                      </div>
+                    )}
+                    {type === 'generator' && (
+                      <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                        Power: +{data.powerProduction}
+                      </div>
+                    )}
+                    {type === 'conveyor' && (
+                      <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                        Spd:{data.speed} | Pwr:{data.powerConsumption}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Weapons (Current Hand) */}
+          <div>
+            <h4 style={{ margin: '0 0 8px 0', color: '#ff6b6b', fontSize: '11px', textTransform: 'uppercase' }}>Arsenal (Shuffles every 30s)</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {currentHand.map(type => {
+                const data = entitiesData[type];
+                if (!data) return null;
+
+                const isSelected = selectedBuilding === type;
               const costMultiplier = activeModifier && modifiersData[activeModifier]?.effects?.costMultiplier || 1;
               const canAfford = data.cost && Object.entries(data.cost).every(
                 ([resource, amount]) => (resources[resource] || 0) >= Math.ceil(amount * costMultiplier)
               );
-
-              const getDisplayName = (t) => {
-                if (t === 'ironRefinery') return 'IRON REFINERY';
-                if (t === 'copperRefinery') return 'COPPER REFINERY';
-                if (t === 'advancedAssembler') return 'ADV ASSEMBLER';
-                if (t === 'droneBay') return 'DRONE BAY';
-                return t.toUpperCase();
-              };
 
               return (
                 <button
@@ -690,7 +755,7 @@ function App() {
                   style={{
                     padding: '8px',
                     backgroundColor: isSelected ? '#444' : '#222',
-                    border: `2px solid ${isSelected ? '#4ade80' : canAfford ? '#444' : '#883333'}`,
+                    border: `2px solid ${isSelected ? '#ff6b6b' : canAfford ? '#444' : '#883333'}`,
                     color: canAfford ? '#fff' : '#888',
                     cursor: canAfford ? 'pointer' : 'not-allowed',
                     textAlign: 'left',
@@ -700,36 +765,22 @@ function App() {
                   disabled={!canAfford}
                 >
                   <div style={{ fontWeight: 'bold', marginBottom: '2px', fontSize: '12px' }}>
-                    {getDisplayName(type)}
+                    {type.toUpperCase()}
                   </div>
                   <div style={{ fontSize: '10px', color: '#888' }}>
                     {data.cost ? Object.entries(data.cost)
                       .map(([r, a]) => `${Math.ceil(a * costMultiplier)} ${r}`)
                       .join(', ') : 'Free'}
                   </div>
-                  {type === 'turret' && (
+                  {data.damage && data.range && data.fireRate && (
                     <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
-                      Dmg:{data.damage} Rng:{data.range} Rate:{data.fireRate}/s
-                    </div>
-                  )}
-                  {(type === 'ironRefinery' || type === 'copperRefinery' || type === 'assembler' || type === 'advancedAssembler') && (
-                    <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
-                      {data.recipe} | Pwr:{data.powerConsumption} | T:{data.productionTime}s
-                    </div>
-                  )}
-                  {type === 'generator' && (
-                    <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
-                      Power: +{data.powerProduction}
-                    </div>
-                  )}
-                  {type === 'conveyor' && (
-                    <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
-                      Spd:{data.speed} | Pwr:{data.powerConsumption}
+                      Dmg:{data.damage} Rng:{data.range} Rate:{data.fireRate}/s HP:{data.hp}
                     </div>
                   )}
                 </button>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
