@@ -18,10 +18,22 @@ export class CombatSystem {
 
       if (combat.timer >= 1 / combat.fireRate) {
         if (entity.type === 'building') {
-          const target = this.findEnemyTarget(entity, combat.range);
-          if (target) {
-            this.spawnProjectile(entity, target, combat.damage);
-            combat.timer = 0;
+          const playerControlled = entity.get('PlayerControlled');
+
+          if (playerControlled) {
+            // Player-controlled turret: fire in the direction it's facing
+            const target = this.findTargetInDirection(entity, combat.range, playerControlled.angle);
+            if (target) {
+              this.spawnProjectile(entity, target, combat.damage);
+              combat.timer = 0;
+            }
+          } else {
+            // Auto-targeting turret
+            const target = this.findEnemyTarget(entity, combat.range);
+            if (target) {
+              this.spawnProjectile(entity, target, combat.damage);
+              combat.timer = 0;
+            }
           }
         } else if (entity.type === 'enemy') {
           const target = this.findBuildingTarget(entity, 1.5);
@@ -99,6 +111,46 @@ export class CombatSystem {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance <= range && distance < minDistance) {
+        closest = other;
+        minDistance = distance;
+      }
+    });
+
+    return closest;
+  }
+
+  findTargetInDirection(entity, range, angleDegrees) {
+    const state = useGame.getState();
+    let closest = null;
+    let minDistance = Infinity;
+
+    // Convert angle to radians
+    const angleRad = (angleDegrees * Math.PI) / 180;
+    const facingX = Math.cos(angleRad);
+    const facingY = Math.sin(angleRad);
+
+    // 30 degree cone (15 degrees on each side)
+    const coneAngle = 15 * Math.PI / 180;
+
+    state.entities.forEach(other => {
+      if (other.type !== 'enemy') return;
+
+      const dx = other.x - entity.x;
+      const dy = other.y - entity.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance > range || distance < 0.1) return;
+
+      // Normalize direction to enemy
+      const dirX = dx / distance;
+      const dirY = dy / distance;
+
+      // Calculate angle between facing direction and enemy direction
+      const dotProduct = facingX * dirX + facingY * dirY;
+      const angleToEnemy = Math.acos(Math.max(-1, Math.min(1, dotProduct)));
+
+      // Check if enemy is within the cone
+      if (angleToEnemy <= coneAngle && distance < minDistance) {
         closest = other;
         minDistance = distance;
       }

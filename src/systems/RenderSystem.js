@@ -107,6 +107,42 @@ export class RenderSystem {
         this.ctx.lineWidth = 2;
         this.ctx.strokeRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
       }
+
+      // Draw player-controlled turret facing indicator
+      const playerControlled = entity.get('PlayerControlled');
+      if (playerControlled) {
+        const angleRad = (playerControlled.angle * Math.PI) / 180;
+        const cx = x + this.tileSize / 2;
+        const cy = y + this.tileSize / 2;
+        const barrelLength = this.tileSize / 2;
+
+        this.ctx.strokeStyle = '#ffff00';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.moveTo(cx, cy);
+        this.ctx.lineTo(
+          cx + Math.cos(angleRad) * barrelLength,
+          cy + Math.sin(angleRad) * barrelLength
+        );
+        this.ctx.stroke();
+
+        // Draw aiming cone (30 degree cone)
+        const coneAngle = 15 * Math.PI / 180;
+        this.ctx.strokeStyle = '#ffff0044';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.moveTo(cx, cy);
+        this.ctx.lineTo(
+          cx + Math.cos(angleRad - coneAngle) * barrelLength * 1.5,
+          cy + Math.sin(angleRad - coneAngle) * barrelLength * 1.5
+        );
+        this.ctx.moveTo(cx, cy);
+        this.ctx.lineTo(
+          cx + Math.cos(angleRad + coneAngle) * barrelLength * 1.5,
+          cy + Math.sin(angleRad + coneAngle) * barrelLength * 1.5
+        );
+        this.ctx.stroke();
+      }
     } else if (entity.type === 'conveyor') {
       const padding = this.tileSize / 16;
       const power = entity.get('Power');

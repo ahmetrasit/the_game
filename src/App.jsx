@@ -9,6 +9,7 @@ import { ProjectileSystem } from './systems/ProjectileSystem';
 import { ProductionSystem } from './systems/ProductionSystem';
 import { ConveyorSystem } from './systems/ConveyorSystem';
 import { PowerSystem } from './systems/PowerSystem';
+import { PlayerControlSystem } from './systems/PlayerControlSystem';
 import { RenderSystem } from './systems/RenderSystem';
 import entitiesData from './data/entities.json';
 
@@ -24,6 +25,7 @@ class GameLoop {
       new PowerSystem(),
       new ProductionSystem(),
       new ConveyorSystem(),
+      new PlayerControlSystem(),
       new RenderSystem(canvas)
     ];
     this.delta = 0;
@@ -137,6 +139,7 @@ function App() {
     turret.y = 25;
     turret.add('Health', { current: 300, max: 300 });
     turret.add('Combat', { damage: 25, range: 15, fireRate: 3, timer: 0 });
+    turret.add('PlayerControlled', { angle: 0, rotationSpeed: 180 }); // 180 degrees per second
     turret.add('Equipment', {});
     useGame.getState().spawn(turret);
 
