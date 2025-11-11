@@ -15,6 +15,14 @@ export class MovementSystem {
       const dist = Math.hypot(dx, dy);
 
       if (dist < 0.1) {
+        const occupant = state.grid[next.y][next.x];
+        if (occupant && occupant !== e.id) {
+          const occupantEntity = state.entities.get(occupant);
+          if (occupantEntity?.type === 'enemy') {
+            return;
+          }
+        }
+
         const oldX = Math.floor(e.x);
         const oldY = Math.floor(e.y);
         e.x = next.x;
@@ -25,13 +33,26 @@ export class MovementSystem {
       } else {
         const oldX = Math.floor(e.x);
         const oldY = Math.floor(e.y);
+        const newX = Math.floor(e.x + (dx / dist) * m.speed * dt);
+        const newY = Math.floor(e.y + (dy / dist) * m.speed * dt);
+
+        if (newX !== oldX || newY !== oldY) {
+          const occupant = state.grid[newY][newX];
+          if (occupant && occupant !== e.id) {
+            const occupantEntity = state.entities.get(occupant);
+            if (occupantEntity?.type === 'enemy') {
+              return;
+            }
+          }
+        }
+
         e.x += (dx / dist) * m.speed * dt;
         e.y += (dy / dist) * m.speed * dt;
 
-        const newX = Math.floor(e.x);
-        const newY = Math.floor(e.y);
+        const finalX = Math.floor(e.x);
+        const finalY = Math.floor(e.y);
 
-        if (oldX !== newX || oldY !== newY) {
+        if (oldX !== finalX || oldY !== finalY) {
           entitiesToUpdate.push({ entity: e, oldX, oldY });
         }
       }
