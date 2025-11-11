@@ -97,6 +97,66 @@ export class RenderSystem {
         );
         this.ctx.stroke();
       }
+    } else if (entity.type === 'collectorCar') {
+      // Draw collector car as a small square
+      const size = this.tileSize / 3;
+      this.ctx.fillStyle = '#ffaa00';
+      this.ctx.fillRect(
+        x + this.tileSize / 2 - size / 2,
+        y + this.tileSize / 2 - size / 2,
+        size,
+        size
+      );
+
+      // Draw outline
+      this.ctx.strokeStyle = '#ffffff';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(
+        x + this.tileSize / 2 - size / 2,
+        y + this.tileSize / 2 - size / 2,
+        size,
+        size
+      );
+
+      // Draw indicator if carrying resources
+      const carComp = entity.get('CollectorCar');
+      if (carComp && carComp.carrying) {
+        this.ctx.fillStyle = '#00ff00';
+        this.ctx.beginPath();
+        this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2 - size / 2 - 3, 3, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    } else if (entity.type === 'resourceDrop') {
+      // Draw resource drop as a small colored circle
+      const dropComp = entity.get('ResourceDrop');
+      if (dropComp) {
+        const radius = this.tileSize / 8;
+
+        // Color based on resource type
+        if (dropComp.resourceType === 'iron') {
+          this.ctx.fillStyle = '#888888';
+        } else if (dropComp.resourceType === 'copper') {
+          this.ctx.fillStyle = '#ff8844';
+        } else if (dropComp.resourceType === 'gears') {
+          this.ctx.fillStyle = '#cccccc';
+        } else if (dropComp.resourceType === 'circuits') {
+          this.ctx.fillStyle = '#00ff00';
+        } else {
+          this.ctx.fillStyle = '#ffffff';
+        }
+
+        this.ctx.beginPath();
+        this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Draw glow
+        this.ctx.shadowBlur = radius;
+        this.ctx.shadowColor = this.ctx.fillStyle;
+        this.ctx.beginPath();
+        this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+      }
     } else if (entity.type === 'building') {
       const padding = this.tileSize / 16;
       const power = entity.get('Power');
@@ -126,6 +186,8 @@ export class RenderSystem {
         this.ctx.fillStyle = '#888888';
       } else if (entity.id.startsWith('droneBay')) {
         this.ctx.fillStyle = '#00ff88';
+      } else if (entity.id.startsWith('carGarage')) {
+        this.ctx.fillStyle = '#ffaa00';
       } else {
         this.ctx.fillStyle = '#4444ff';
       }
@@ -273,6 +335,8 @@ export class RenderSystem {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#888888';
     } else if (buildingType === 'droneBay') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#00ff88';
+    } else if (buildingType === 'carGarage') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ffaa00';
     } else if (buildingType === 'conveyor') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#666';
     }

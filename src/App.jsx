@@ -13,6 +13,7 @@ import { PowerSystem } from './systems/PowerSystem';
 import { PlayerControlSystem } from './systems/PlayerControlSystem';
 import { RepairSystem } from './systems/RepairSystem';
 import { DroneSystem } from './systems/DroneSystem';
+import { CollectorCarSystem } from './systems/CollectorCarSystem';
 import { UpgradeSystem } from './systems/UpgradeSystem';
 import { DeckShuffleSystem } from './systems/DeckShuffleSystem';
 import { RenderSystem } from './systems/RenderSystem';
@@ -35,6 +36,7 @@ class GameLoop {
       new PlayerControlSystem(),
       new RepairSystem(),
       new DroneSystem(),
+      new CollectorCarSystem(),
       new UpgradeSystem(),
       this.deckShuffleSystem,
       new RenderSystem(canvas)
@@ -350,6 +352,14 @@ function App() {
     });
     droneBay.add('Equipment', {});
     useGame.getState().spawn(droneBay);
+
+    // Starting car garage
+    const carGarage = new Entity('carGarage1', 'building');
+    carGarage.x = 24;
+    carGarage.y = 23;
+    carGarage.add('Health', { current: 250, max: 250 });
+    carGarage.add('Equipment', {});
+    useGame.getState().spawn(carGarage);
   }, [gameStarted]);
 
   useEffect(() => {
@@ -439,6 +449,8 @@ function App() {
           productionTime: buildingData.droneProductionTime,
           productionProgress: 0
         });
+      } else if (state.selectedBuilding === 'carGarage') {
+        // Car garage just needs Health and Equipment, the CollectorCarSystem handles spawning cars
       } else if (state.selectedBuilding === 'conveyor') {
         const dir = getDirectionFromRotation(state.buildingRotation);
         entity.add('Conveyor', { items: [], speed: buildingData.speed, dir });

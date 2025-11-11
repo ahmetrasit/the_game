@@ -109,7 +109,7 @@ export const useGame = create((set, get) => ({
   shuffleDeck: () => {
     const state = get();
     // All infrastructure buildings
-    const allInfrastructure = ['generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'];
+    const allInfrastructure = ['generator', 'storage', 'droneBay', 'carGarage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'];
 
     // Shuffle and pick 3 random infrastructure buildings
     const shuffledInfra = [...allInfrastructure].sort(() => Math.random() - 0.5);

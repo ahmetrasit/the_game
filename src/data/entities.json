@@ -144,5 +144,14 @@
       "copperPlates": 30,
       "circuits": 10
     }
+  },
+  "carGarage": {
+    "hp": 250,
+    "collectorCarSpeed": 3,
+    "collectorCarHP": 50,
+    "cost": {
+      "ironPlates": 20,
+      "gears": 10
+    }
   }
 }
