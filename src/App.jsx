@@ -156,9 +156,9 @@ function App() {
     renderSystemRef.current = game.systems[game.systems.length - 1];
     game.start();
 
-    // ========== MINIMAL 3x4 STARTER FACTORY (24,24) to (27,26) ========== //
+    // ========== MINIMAL 3x5 STARTER FACTORY (24,24) to (28,26) ========== //
 
-    // ROW 24 - Top row: generator, generator3, storage
+    // ROW 24 - Top row: generator, gear assembler, storage
     const generator1 = new Entity('generator1', 'building');
     generator1.x = 24;
     generator1.y = 24;
@@ -167,13 +167,14 @@ function App() {
     generator1.add('Equipment', {});
     useGame.getState().spawn(generator1);
 
-    const generator3 = new Entity('generator3', 'building');
-    generator3.x = 25;
-    generator3.y = 24;
-    generator3.add('Health', { current: 150, max: 150 });
-    generator3.add('Power', { production: 20, consumption: 0, connected: true });
-    generator3.add('Equipment', {});
-    useGame.getState().spawn(generator3);
+    const assembler1 = new Entity('assembler1', 'building');
+    assembler1.x = 25;
+    assembler1.y = 24;
+    assembler1.add('Health', { current: 250, max: 250 });
+    assembler1.add('Production', { recipe: 'gears', time: 1, progress: 0 });
+    assembler1.add('Power', { production: 0, consumption: 10, connected: false });
+    assembler1.add('Equipment', {});
+    useGame.getState().spawn(assembler1);
 
     const storage1 = new Entity('storage1', 'building');
     storage1.x = 26;
@@ -208,7 +209,7 @@ function App() {
     droneBay1.add('Equipment', {});
     useGame.getState().spawn(droneBay1);
 
-    // ROW 26 - Production row: iron refinery, copper refinery2, car garage
+    // ROW 26 - Production row: iron refinery, advanced assembler, car garage
     const ironRefinery1 = new Entity('ironRefinery1', 'building');
     ironRefinery1.x = 24;
     ironRefinery1.y = 26;
@@ -218,14 +219,14 @@ function App() {
     ironRefinery1.add('Equipment', {});
     useGame.getState().spawn(ironRefinery1);
 
-    const copperRefinery2 = new Entity('copperRefinery2', 'building');
-    copperRefinery2.x = 25;
-    copperRefinery2.y = 26;
-    copperRefinery2.add('Health', { current: 200, max: 200 });
-    copperRefinery2.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
-    copperRefinery2.add('Power', { production: 0, consumption: 5, connected: false });
-    copperRefinery2.add('Equipment', {});
-    useGame.getState().spawn(copperRefinery2);
+    const advancedAssembler1 = new Entity('advancedAssembler1', 'building');
+    advancedAssembler1.x = 25;
+    advancedAssembler1.y = 26;
+    advancedAssembler1.add('Health', { current: 300, max: 300 });
+    advancedAssembler1.add('Production', { recipe: 'circuits', time: 3, progress: 0 });
+    advancedAssembler1.add('Power', { production: 0, consumption: 15, connected: false });
+    advancedAssembler1.add('Equipment', {});
+    useGame.getState().spawn(advancedAssembler1);
 
     const carGarage1 = new Entity('carGarage1', 'building');
     carGarage1.x = 26;
@@ -259,6 +260,21 @@ function App() {
     turret5.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
     turret5.add('Equipment', {});
     useGame.getState().spawn(turret5);
+
+    // ROW 28 - Wall row: 2 walls for defense
+    const wall1 = new Entity('wall1', 'building');
+    wall1.x = 24;
+    wall1.y = 28;
+    wall1.add('Health', { current: 500, max: 500 });
+    wall1.add('Equipment', {});
+    useGame.getState().spawn(wall1);
+
+    const wall2 = new Entity('wall2', 'building');
+    wall2.x = 26;
+    wall2.y = 28;
+    wall2.add('Health', { current: 500, max: 500 });
+    wall2.add('Equipment', {});
+    useGame.getState().spawn(wall2);
 
   }, [gameStarted]);
 
