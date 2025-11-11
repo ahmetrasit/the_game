@@ -10,6 +10,7 @@ import { ProductionSystem } from './systems/ProductionSystem';
 import { ConveyorSystem } from './systems/ConveyorSystem';
 import { PowerSystem } from './systems/PowerSystem';
 import { RenderSystem } from './systems/RenderSystem';
+import entitiesData from './data/entities.json';
 
 class GameLoop {
   constructor(canvas) {
@@ -75,7 +76,8 @@ class GameLoop {
 function App() {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
-  const { resources, entities, gameTime } = useGame();
+  const renderSystemRef = useRef(null);
+  const { resources, entities, gameTime, selectedBuilding, buildingRotation } = useGame();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -126,6 +128,7 @@ function App() {
 
     const game = new GameLoop(canvasRef.current);
     gameRef.current = game;
+    renderSystemRef.current = game.systems[game.systems.length - 1];
     game.start();
 
     const turret = new Entity('t1', 'building');
@@ -179,6 +182,119 @@ function App() {
     useGame.getState().spawn(storage);
   }, []);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) / (canvas.width / 50));
+      const y = Math.floor((e.clientY - rect.top) / (canvas.height / 50));
+
+      if (x >= 0 && x < 50 && y >= 0 && y < 50 && renderSystemRef.current) {
+        renderSystemRef.current.setHoverTile(x, y);
+      }
+    };
+
+    const handleMouseClick = (e) => {
+      const state = useGame.getState();
+      if (!state.selectedBuilding) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) / (canvas.width / 50));
+      const y = Math.floor((e.clientY - rect.top) / (canvas.height / 50));
+
+      if (x < 0 || x >= 50 || y < 0 || y >= 50) return;
+      if (state.grid[y][x] !== null) return;
+
+      const buildingData = entitiesData[state.selectedBuilding];
+      if (!buildingData || !buildingData.cost) return;
+
+      const canAfford = Object.entries(buildingData.cost).every(
+        ([resource, amount]) => (state.resources[resource] || 0) >= amount
+      );
+
+      if (!canAfford) return;
+
+      Object.entries(buildingData.cost).forEach(([resource, amount]) => {
+        state.addResource(resource, -amount);
+      });
+
+      const entityType = state.selectedBuilding === 'conveyor' ? 'conveyor' : 'building';
+      const entity = new Entity(`${state.selectedBuilding}_${state.getNextEntityId()}`, entityType);
+      entity.x = x;
+      entity.y = y;
+
+      entity.add('Health', { current: buildingData.hp, max: buildingData.hp });
+      entity.add('Equipment', {});
+
+      if (state.selectedBuilding === 'turret') {
+        entity.add('Combat', {
+          damage: buildingData.damage,
+          range: buildingData.range,
+          fireRate: buildingData.fireRate,
+          timer: 0
+        });
+      } else if (state.selectedBuilding === 'refinery') {
+        entity.add('Production', {
+          recipe: buildingData.recipe,
+          time: buildingData.productionTime,
+          progress: 0
+        });
+        entity.add('Power', {
+          production: 0,
+          consumption: buildingData.powerConsumption,
+          connected: false
+        });
+      } else if (state.selectedBuilding === 'generator') {
+        entity.add('Power', {
+          production: buildingData.powerProduction,
+          consumption: 0,
+          connected: true
+        });
+      } else if (state.selectedBuilding === 'conveyor') {
+        const dir = getDirectionFromRotation(state.buildingRotation);
+        entity.add('Conveyor', { items: [], speed: buildingData.speed, dir });
+        entity.add('Power', {
+          production: 0,
+          consumption: buildingData.powerConsumption,
+          connected: false
+        });
+      }
+
+      state.spawn(entity);
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'r' || e.key === 'R') {
+        useGame.getState().rotateBuilding();
+      }
+      if (e.key === 'Escape') {
+        useGame.getState().selectBuilding(null);
+      }
+    };
+
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('click', handleMouseClick);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('click', handleMouseClick);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const getDirectionFromRotation = (rotation) => {
+    switch (rotation) {
+      case 0: return { x: 1, y: 0 };
+      case 90: return { x: 0, y: 1 };
+      case 180: return { x: -1, y: 0 };
+      case 270: return { x: 0, y: -1 };
+      default: return { x: 1, y: 0 };
+    }
+  };
+
   return (
     <div style={{
       display: 'flex',
@@ -217,10 +333,82 @@ function App() {
           border: '1px solid #444',
           margin: '0 10px 10px 10px',
           backgroundColor: '#111',
-          padding: '10px'
+          padding: '10px',
+          overflow: 'auto'
         }}>
-          <div style={{ color: '#888', fontSize: '12px' }}>
-            Reserved for future features
+          <h3 style={{ margin: '0 0 10px 0', color: '#fff' }}>Buildings</h3>
+          <div style={{ color: '#aaa', fontSize: '11px', marginBottom: '15px' }}>
+            Click to select, then click on grid to place. Press [R] to rotate conveyors. [ESC] to cancel.
+          </div>
+
+          {selectedBuilding && (
+            <div style={{
+              padding: '8px',
+              backgroundColor: '#222',
+              marginBottom: '10px',
+              border: '1px solid #444',
+              fontSize: '12px',
+              color: '#4ade80'
+            }}>
+              Selected: {selectedBuilding.toUpperCase()} {selectedBuilding === 'conveyor' && `(${buildingRotation}°)`}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {['turret', 'refinery', 'generator', 'storage', 'conveyor'].map(type => {
+              const data = entitiesData[type];
+              const isSelected = selectedBuilding === type;
+              const canAfford = data.cost && Object.entries(data.cost).every(
+                ([resource, amount]) => (resources[resource] || 0) >= amount
+              );
+
+              return (
+                <button
+                  key={type}
+                  onClick={() => useGame.getState().selectBuilding(type)}
+                  style={{
+                    padding: '10px',
+                    backgroundColor: isSelected ? '#444' : '#222',
+                    border: `2px solid ${isSelected ? '#4ade80' : canAfford ? '#444' : '#883333'}`,
+                    color: canAfford ? '#fff' : '#888',
+                    cursor: canAfford ? 'pointer' : 'not-allowed',
+                    textAlign: 'left',
+                    fontSize: '13px',
+                    fontFamily: 'monospace'
+                  }}
+                  disabled={!canAfford}
+                >
+                  <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                    {type.toUpperCase()}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#888' }}>
+                    Cost: {data.cost ? Object.entries(data.cost)
+                      .map(([r, a]) => `${a} ${r}`)
+                      .join(', ') : 'None'}
+                  </div>
+                  {type === 'turret' && (
+                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                      Dmg: {data.damage} | Range: {data.range} | Rate: {data.fireRate}/s
+                    </div>
+                  )}
+                  {type === 'refinery' && (
+                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                      Produces: {data.recipe} | Power: {data.powerConsumption}
+                    </div>
+                  )}
+                  {type === 'generator' && (
+                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                      Power: +{data.powerProduction}
+                    </div>
+                  )}
+                  {type === 'conveyor' && (
+                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                      Speed: {data.speed} | Power: {data.powerConsumption}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

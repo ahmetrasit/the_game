@@ -7,6 +7,9 @@ export const useGame = create((set, get) => ({
   isPaused: false,
   gameTime: 0,
   metrics: { curiosity: 0, perseverance: 0, events: [] },
+  selectedBuilding: null,
+  buildingRotation: 0,
+  nextEntityId: 0,
 
   spawn: (entity) => set((state) => {
     const newEntities = new Map(state.entities);
@@ -45,5 +48,18 @@ export const useGame = create((set, get) => ({
     gameTime: state.gameTime + delta
   })),
 
-  togglePause: () => set((state) => ({ isPaused: !state.isPaused }))
+  togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
+
+  selectBuilding: (type) => set({ selectedBuilding: type, buildingRotation: 0 }),
+
+  rotateBuilding: () => set((state) => ({
+    buildingRotation: (state.buildingRotation + 90) % 360
+  })),
+
+  getNextEntityId: () => {
+    const state = get();
+    const id = state.nextEntityId;
+    set({ nextEntityId: id + 1 });
+    return id;
+  }
 }));

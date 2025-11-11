@@ -4,7 +4,12 @@ export class RenderSystem {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.tileSize = canvas.width / 50; // Dynamic tile size based on canvas width
+    this.tileSize = canvas.width / 50;
+    this.hoverTile = null;
+  }
+
+  setHoverTile(x, y) {
+    this.hoverTile = { x, y };
   }
 
   update() {
@@ -18,6 +23,10 @@ export class RenderSystem {
       this.drawEntity(entity);
       this.drawHealthBar(entity);
     });
+
+    if (state.selectedBuilding && this.hoverTile) {
+      this.drawPlacementPreview(this.hoverTile.x, this.hoverTile.y, state.selectedBuilding, state.buildingRotation, state.grid);
+    }
   }
 
   drawGrid() {
@@ -145,5 +154,54 @@ export class RenderSystem {
 
     this.ctx.fillStyle = ratio > 0.5 ? '#4ade80' : ratio > 0.25 ? '#fbbf24' : '#ef4444';
     this.ctx.fillRect(x + padding, y - offset, barWidth * ratio, barHeight);
+  }
+
+  drawPlacementPreview(gridX, gridY, buildingType, rotation, grid) {
+    const x = gridX * this.tileSize;
+    const y = gridY * this.tileSize;
+    const padding = this.tileSize / 16;
+
+    const isOccupied = grid[gridY]?.[gridX] !== null;
+
+    this.ctx.globalAlpha = 0.5;
+
+    if (buildingType === 'turret') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#4444ff';
+    } else if (buildingType === 'refinery') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ff8800';
+    } else if (buildingType === 'generator') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ffff00';
+    } else if (buildingType === 'storage') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#888888';
+    } else if (buildingType === 'conveyor') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#666';
+    }
+
+    this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+
+    if (buildingType === 'conveyor') {
+      const dir = this.getDirectionFromRotation(rotation);
+      this.ctx.strokeStyle = isOccupied ? '#ff0000' : '#aaa';
+      this.ctx.lineWidth = 2;
+      this.ctx.beginPath();
+      const cx = x + this.tileSize / 2;
+      const cy = y + this.tileSize / 2;
+      const arrowLen = this.tileSize / 3;
+      this.ctx.moveTo(cx - dir.x * arrowLen, cy - dir.y * arrowLen);
+      this.ctx.lineTo(cx + dir.x * arrowLen, cy + dir.y * arrowLen);
+      this.ctx.stroke();
+    }
+
+    this.ctx.globalAlpha = 1;
+  }
+
+  getDirectionFromRotation(rotation) {
+    switch (rotation) {
+      case 0: return { x: 1, y: 0 };
+      case 90: return { x: 0, y: 1 };
+      case 180: return { x: -1, y: 0 };
+      case 270: return { x: 0, y: -1 };
+      default: return { x: 1, y: 0 };
+    }
   }
 }
