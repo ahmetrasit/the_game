@@ -36,6 +36,10 @@ export class CombatSystem {
             // Auto-targeting turret
             const target = this.findEnemyTarget(entity, modifiedRange);
             if (target) {
+              // Store target angle for visual rotation
+              const angle = Math.atan2(target.y - entity.y, target.x - entity.x);
+              combat.targetAngle = angle;
+
               this.spawnProjectile(entity, target, modifiedDamage);
               combat.timer = 0;
             }
@@ -76,11 +80,19 @@ export class CombatSystem {
     const dist = Math.hypot(dx, dy);
     const speed = 20; // tiles per second
 
+    // Determine weapon type from source entity ID
+    let weaponType = 'turret';
+    if (source.id.startsWith('laserTurret')) weaponType = 'laser';
+    else if (source.id.startsWith('cannon')) weaponType = 'cannon';
+    else if (source.id.startsWith('sniperTurret')) weaponType = 'sniper';
+    else if (source.id.startsWith('machineGun')) weaponType = 'machineGun';
+
     projectile.add('Projectile', {
       vx: (dx / dist) * speed,
       vy: (dy / dist) * speed,
       targetId: target.id,
-      damage: damage
+      damage: damage,
+      weaponType: weaponType
     });
 
     state.spawn(projectile);
