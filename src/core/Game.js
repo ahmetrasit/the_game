@@ -108,16 +108,19 @@ export const useGame = create((set, get) => ({
 
   shuffleDeck: () => {
     const state = get();
-    // Infrastructure buildings are always available
-    const infrastructureBuildings = ['generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'];
+    // All infrastructure buildings
+    const allInfrastructure = ['generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'];
 
-    // Shuffle weapons and pick 3 random ones
-    const shuffled = [...state.selectedDeck].sort(() => Math.random() - 0.5);
-    const weaponHandSize = Math.min(3, shuffled.length);
-    const weaponHand = shuffled.slice(0, weaponHandSize);
+    // Shuffle and pick 3 random infrastructure buildings
+    const shuffledInfra = [...allInfrastructure].sort(() => Math.random() - 0.5);
+    const infraHand = shuffledInfra.slice(0, 3);
 
-    // Always include infrastructure + random weapons
-    set({ currentHand: [...infrastructureBuildings, ...weaponHand] });
+    // Shuffle weapons and pick 1 random one
+    const shuffledWeapons = [...state.selectedDeck].sort(() => Math.random() - 0.5);
+    const weaponHand = shuffledWeapons.slice(0, 1);
+
+    // 3 infrastructure + 1 weapon
+    set({ currentHand: [...infraHand, ...weaponHand] });
   },
 
   applyUpgrade: (type) => set((state) => {

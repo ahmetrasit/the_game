@@ -486,6 +486,9 @@ function App() {
   const [tempDeck, setTempDeck] = React.useState(['wall', 'turret', 'laserTurret', 'cannon']);
   const [tempModifier, setTempModifier] = React.useState('normal');
 
+  const maxWeapons = 4;
+  const minWeapons = 4;
+
   const handleStartGame = () => {
     useGame.getState().startGame(tempDeck, tempModifier);
     useGame.getState().shuffleDeck();
@@ -514,10 +517,10 @@ function App() {
         }}>
           <h1 style={{ color: '#4ade80', marginBottom: '20px' }}>SELECT YOUR ARSENAL</h1>
           <p style={{ color: '#888', marginBottom: '30px' }}>
-            Choose 3-6 weapon types for this run. Your deck shuffles every 30s, revealing 3 random weapons. Infrastructure buildings are always available.
+            Choose 4 weapons from 6 available. Every 30s, your deck shuffles to reveal 3 random infrastructure buildings + 1 random weapon.
           </p>
 
-          <h3 style={{ color: '#fff', marginBottom: '15px' }}>Select Weapons ({tempDeck.length}/6)</h3>
+          <h3 style={{ color: '#fff', marginBottom: '15px' }}>Select Weapons ({tempDeck.length}/{maxWeapons})</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '30px' }}>
             {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun'].map(type => {
               const isSelected = tempDeck.includes(type);
@@ -527,7 +530,7 @@ function App() {
                   onClick={() => {
                     if (isSelected) {
                       setTempDeck(tempDeck.filter(t => t !== type));
-                    } else if (tempDeck.length < 6) {
+                    } else if (tempDeck.length < maxWeapons) {
                       setTempDeck([...tempDeck, type]);
                     }
                   }}
@@ -574,20 +577,20 @@ function App() {
 
           <button
             onClick={handleStartGame}
-            disabled={tempDeck.length < 3}
+            disabled={tempDeck.length < minWeapons}
             style={{
               width: '100%',
               padding: '20px',
               fontSize: '20px',
               fontWeight: 'bold',
-              backgroundColor: tempDeck.length >= 3 ? '#4ade80' : '#555',
+              backgroundColor: tempDeck.length >= minWeapons ? '#4ade80' : '#555',
               border: 'none',
               borderRadius: '10px',
-              color: tempDeck.length >= 3 ? '#000' : '#888',
-              cursor: tempDeck.length >= 3 ? 'pointer' : 'not-allowed'
+              color: tempDeck.length >= minWeapons ? '#000' : '#888',
+              cursor: tempDeck.length >= minWeapons ? 'pointer' : 'not-allowed'
             }}
           >
-            START GAME {tempDeck.length >= 3 ? '' : `(Select at least 3 weapons)`}
+            START GAME {tempDeck.length >= minWeapons ? '' : `(Select exactly ${minWeapons} weapons)`}
           </button>
         </div>
       </div>
