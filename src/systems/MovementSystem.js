@@ -15,17 +15,17 @@ export class MovementSystem {
       const ox = Math.floor(other.x);
       const oy = Math.floor(other.y);
       const tileDist = Math.abs(ex - ox) + Math.abs(ey - oy);
-      if (tileDist > 1) return;
+      if (tileDist > 2) return;
 
       const dx = entity.x - other.x;
       const dy = entity.y - other.y;
       const dist = Math.hypot(dx, dy);
 
-      if (dist < 0.5 && dist > 0.01) {
+      if (dist < 1.0 && dist > 0.01) {
         nearbyCount++;
-        const force = (0.5 - dist) / 0.5;
-        separationX += (dx / dist) * force * 0.3;
-        separationY += (dy / dist) * force * 0.3;
+        const force = (1.0 - dist) / 1.0;
+        separationX += (dx / dist) * force * 1.5;
+        separationY += (dy / dist) * force * 1.5;
       }
     });
 
