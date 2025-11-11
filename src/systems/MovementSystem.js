@@ -1,16 +1,32 @@
 import { useGame } from '../core/Game';
 
 export class MovementSystem {
-  countNearbyEnemies(x, y, excludeId, entities, radius = 0.6) {
-    let count = 0;
+  calculateRepulsion(entity, entities, radius = 0.8) {
+    let repulsionX = 0;
+    let repulsionY = 0;
+    let nearbyCount = 0;
+
     entities.forEach(other => {
-      if (other.id === excludeId || other.type !== 'enemy') return;
-      const dx = other.x - x;
-      const dy = other.y - y;
+      if (other.id === entity.id || other.type !== 'enemy') return;
+
+      const dx = entity.x - other.x;
+      const dy = entity.y - other.y;
       const dist = Math.hypot(dx, dy);
-      if (dist < radius) count++;
+
+      if (dist < radius && dist > 0.01) {
+        nearbyCount++;
+        const force = (radius - dist) / radius;
+        repulsionX += (dx / dist) * force;
+        repulsionY += (dy / dist) * force;
+      }
     });
-    return count;
+
+    if (nearbyCount > 3) {
+      const strength = Math.min(nearbyCount / 5, 2);
+      return { x: repulsionX * strength, y: repulsionY * strength };
+    }
+
+    return { x: 0, y: 0 };
   }
 
   update(dt) {
@@ -30,6 +46,8 @@ export class MovementSystem {
         m.randomOffset = { x: (Math.random() - 0.5) * 0.3, y: (Math.random() - 0.5) * 0.3 };
       }
 
+      const repulsion = this.calculateRepulsion(e, state.entities);
+
       if (dist < 0.15) {
         const occupant = state.grid[next.y]?.[next.x];
         if (occupant && occupant !== e.id) {
@@ -39,28 +57,27 @@ export class MovementSystem {
           }
         }
 
-        const nearbyCount = this.countNearbyEnemies(next.x, next.y, e.id, state.entities);
-        if (nearbyCount >= 5) {
-          return;
-        }
-
         const oldX = Math.floor(e.x);
         const oldY = Math.floor(e.y);
-        e.x = next.x;
-        e.y = next.y;
+        e.x = next.x + repulsion.x * 0.3;
+        e.y = next.y + repulsion.y * 0.3;
         m.path.shift();
         m.randomOffset = null;
 
         entitiesToUpdate.push({ entity: e, oldX, oldY });
       } else {
-        dx += m.randomOffset.x;
-        dy += m.randomOffset.y;
+        dx += m.randomOffset.x + repulsion.x * 0.5;
+        dy += m.randomOffset.y + repulsion.y * 0.5;
         const randomDist = Math.hypot(dx, dy);
+
+        if (randomDist < 0.01) return;
 
         const moveX = (dx / randomDist) * m.speed * dt;
         const moveY = (dy / randomDist) * m.speed * dt;
         const newPosX = e.x + moveX;
         const newPosY = e.y + moveY;
+
+        if (newPosX < 0 || newPosX >= 50 || newPosY < 0 || newPosY >= 50) return;
 
         const occupant = state.grid[Math.floor(newPosY)]?.[Math.floor(newPosX)];
         if (occupant && occupant !== e.id) {
@@ -68,11 +85,6 @@ export class MovementSystem {
           if (occupantEntity?.type === 'building') {
             return;
           }
-        }
-
-        const nearbyCount = this.countNearbyEnemies(newPosX, newPosY, e.id, state.entities);
-        if (nearbyCount >= 5) {
-          return;
         }
 
         const oldX = Math.floor(e.x);
