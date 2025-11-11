@@ -184,6 +184,80 @@ function App() {
     storage.add('Health', { current: 100, max: 100 });
     storage.add('Equipment', {});
     useGame.getState().spawn(storage);
+
+    // Second iron refinery
+    const ironRefinery2 = new Entity('ironRefinery2', 'building');
+    ironRefinery2.x = 20;
+    ironRefinery2.y = 22;
+    ironRefinery2.add('Health', { current: 200, max: 200 });
+    ironRefinery2.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
+    ironRefinery2.add('Power', { production: 0, consumption: 5, connected: false });
+    ironRefinery2.add('Equipment', {});
+    useGame.getState().spawn(ironRefinery2);
+
+    // Copper refinery
+    const copperRefinery = new Entity('copperRefinery1', 'building');
+    copperRefinery.x = 22;
+    copperRefinery.y = 22;
+    copperRefinery.add('Health', { current: 200, max: 200 });
+    copperRefinery.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
+    copperRefinery.add('Power', { production: 0, consumption: 5, connected: false });
+    copperRefinery.add('Equipment', {});
+    useGame.getState().spawn(copperRefinery);
+
+    // Laser turret 1
+    const laserTurret1 = new Entity('laserTurret1', 'building');
+    laserTurret1.x = 23;
+    laserTurret1.y = 23;
+    laserTurret1.add('Health', { current: 250, max: 250 });
+    laserTurret1.add('Combat', { damage: 5, range: 12, fireRate: 3, timer: 0 });
+    laserTurret1.add('Equipment', {});
+    useGame.getState().spawn(laserTurret1);
+
+    // Laser turret 2
+    const laserTurret2 = new Entity('laserTurret2', 'building');
+    laserTurret2.x = 27;
+    laserTurret2.y = 23;
+    laserTurret2.add('Health', { current: 250, max: 250 });
+    laserTurret2.add('Combat', { damage: 5, range: 12, fireRate: 3, timer: 0 });
+    laserTurret2.add('Equipment', {});
+    useGame.getState().spawn(laserTurret2);
+
+    // Defensive walls
+    const wall1 = new Entity('wall1', 'building');
+    wall1.x = 23;
+    wall1.y = 27;
+    wall1.add('Health', { current: 500, max: 500 });
+    wall1.add('Equipment', {});
+    useGame.getState().spawn(wall1);
+
+    const wall2 = new Entity('wall2', 'building');
+    wall2.x = 24;
+    wall2.y = 27;
+    wall2.add('Health', { current: 500, max: 500 });
+    wall2.add('Equipment', {});
+    useGame.getState().spawn(wall2);
+
+    const wall3 = new Entity('wall3', 'building');
+    wall3.x = 25;
+    wall3.y = 27;
+    wall3.add('Health', { current: 500, max: 500 });
+    wall3.add('Equipment', {});
+    useGame.getState().spawn(wall3);
+
+    const wall4 = new Entity('wall4', 'building');
+    wall4.x = 26;
+    wall4.y = 27;
+    wall4.add('Health', { current: 500, max: 500 });
+    wall4.add('Equipment', {});
+    useGame.getState().spawn(wall4);
+
+    const wall5 = new Entity('wall5', 'building');
+    wall5.x = 27;
+    wall5.y = 27;
+    wall5.add('Health', { current: 500, max: 500 });
+    wall5.add('Equipment', {});
+    useGame.getState().spawn(wall5);
   }, []);
 
   useEffect(() => {
