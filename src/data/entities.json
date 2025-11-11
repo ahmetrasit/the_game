@@ -5,7 +5,8 @@
     "range": 8,
     "fireRate": 1,
     "cost": {
-      "iron": 40
+      "ironPlates": 25,
+      "copperPlates": 10
     }
   },
   "laserTurret": {
@@ -14,9 +15,9 @@
     "range": 12,
     "fireRate": 3,
     "cost": {
-      "ironPlates": 30,
-      "copperPlates": 20,
-      "circuits": 5
+      "ironPlates": 50,
+      "copperPlates": 30,
+      "circuits": 10
     }
   },
   "cannon": {
@@ -25,8 +26,8 @@
     "range": 6,
     "fireRate": 0.5,
     "cost": {
-      "ironPlates": 50,
-      "gears": 10
+      "ironPlates": 80,
+      "gears": 20
     }
   },
   "sniperTurret": {
@@ -35,9 +36,9 @@
     "range": 15,
     "fireRate": 0.33,
     "cost": {
-      "ironPlates": 40,
-      "circuits": 10,
-      "gears": 5
+      "ironPlates": 60,
+      "circuits": 15,
+      "gears": 10
     }
   },
   "machineGun": {
@@ -46,9 +47,9 @@
     "range": 7,
     "fireRate": 5,
     "cost": {
-      "ironPlates": 35,
-      "copperPlates": 15,
-      "gears": 8
+      "ironPlates": 55,
+      "copperPlates": 25,
+      "gears": 15
     }
   },
   "scout": {
@@ -66,8 +67,8 @@
     "productionTime": 2,
     "powerConsumption": 5,
     "cost": {
-      "iron": 20,
-      "copper": 10
+      "iron": 50,
+      "copper": 30
     }
   },
   "copperRefinery": {
@@ -76,8 +77,8 @@
     "productionTime": 2,
     "powerConsumption": 5,
     "cost": {
-      "iron": 20,
-      "copper": 10
+      "iron": 50,
+      "copper": 30
     }
   },
   "assembler": {
