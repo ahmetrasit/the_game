@@ -156,7 +156,7 @@ function App() {
     renderSystemRef.current = game.systems[game.systems.length - 1];
     game.start();
 
-    // ========== MINIMAL 3x3 STARTER FACTORY (24,24) to (26,26) ========== //
+    // ========== MINIMAL 3x4 STARTER FACTORY (24,24) to (27,26) ========== //
 
     // ROW 24 - Top row: generator, turret, storage
     const generator1 = new Entity('generator1', 'building');
@@ -208,7 +208,7 @@ function App() {
     droneBay1.add('Equipment', {});
     useGame.getState().spawn(droneBay1);
 
-    // ROW 26 - Bottom row: iron refinery, turret, car garage
+    // ROW 26 - Production row: iron refinery, turret, car garage
     const ironRefinery1 = new Entity('ironRefinery1', 'building');
     ironRefinery1.x = 24;
     ironRefinery1.y = 26;
@@ -232,6 +232,32 @@ function App() {
     carGarage1.add('Health', { current: 250, max: 250 });
     carGarage1.add('Equipment', {});
     useGame.getState().spawn(carGarage1);
+
+    // ROW 27 - Bottom row: generator2, copper refinery, turret
+    const generator2 = new Entity('generator2', 'building');
+    generator2.x = 24;
+    generator2.y = 27;
+    generator2.add('Health', { current: 150, max: 150 });
+    generator2.add('Power', { production: 20, consumption: 0, connected: true });
+    generator2.add('Equipment', {});
+    useGame.getState().spawn(generator2);
+
+    const copperRefinery1 = new Entity('copperRefinery1', 'building');
+    copperRefinery1.x = 25;
+    copperRefinery1.y = 27;
+    copperRefinery1.add('Health', { current: 200, max: 200 });
+    copperRefinery1.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
+    copperRefinery1.add('Power', { production: 0, consumption: 5, connected: false });
+    copperRefinery1.add('Equipment', {});
+    useGame.getState().spawn(copperRefinery1);
+
+    const turret5 = new Entity('turret5', 'building');
+    turret5.x = 26;
+    turret5.y = 27;
+    turret5.add('Health', { current: 300, max: 300 });
+    turret5.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
+    turret5.add('Equipment', {});
+    useGame.getState().spawn(turret5);
 
   }, [gameStarted]);
 
