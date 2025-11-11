@@ -19,7 +19,10 @@ export class ConveyorSystem {
             const nextConv = next.get('Conveyor');
             if (nextConv) {
               nextConv.items.push({ ...item, pos: 0 });
-            } else if (next.type === 'storage') {
+            } else if (next.type === 'building' && next.id.startsWith('storage')) {
+              state.addResource(item.type, item.amount || 1);
+            } else if (next.type === 'building') {
+              // Any other building acts as sink - items go to resources
               state.addResource(item.type, item.amount || 1);
             }
           }
