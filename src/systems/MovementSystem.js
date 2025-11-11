@@ -22,7 +22,7 @@ export class MovementSystem {
     });
 
     if (nearbyCount > 3) {
-      const strength = Math.min(nearbyCount / 5, 2);
+      const strength = Math.min(nearbyCount / 5, 2) * 5;
       return { x: repulsionX * strength, y: repulsionY * strength };
     }
 
@@ -36,6 +36,21 @@ export class MovementSystem {
     state.entities.forEach(e => {
       const m = e.get('Movement');
       if (!m?.path?.length) return;
+
+      if (!m.lastPosition) {
+        m.lastPosition = { x: e.x, y: e.y, time: 0 };
+      }
+
+      m.lastPosition.time += dt;
+      if (m.lastPosition.time > 1) {
+        const moveDist = Math.hypot(e.x - m.lastPosition.x, e.y - m.lastPosition.y);
+        if (moveDist < 0.5) {
+          m.path = null;
+          m.lastPosition.time = 0;
+          return;
+        }
+        m.lastPosition = { x: e.x, y: e.y, time: 0 };
+      }
 
       const next = m.path[0];
       let dx = next.x - e.x;
@@ -59,18 +74,26 @@ export class MovementSystem {
 
         const oldX = Math.floor(e.x);
         const oldY = Math.floor(e.y);
-        e.x = next.x + repulsion.x * 0.3;
-        e.y = next.y + repulsion.y * 0.3;
+        e.x = next.x + repulsion.x * 0.5;
+        e.y = next.y + repulsion.y * 0.5;
+
+        e.x = Math.max(0, Math.min(49.9, e.x));
+        e.y = Math.max(0, Math.min(49.9, e.y));
+
         m.path.shift();
         m.randomOffset = null;
 
         entitiesToUpdate.push({ entity: e, oldX, oldY });
       } else {
-        dx += m.randomOffset.x + repulsion.x * 0.5;
-        dy += m.randomOffset.y + repulsion.y * 0.5;
+        dx += m.randomOffset.x + repulsion.x;
+        dy += m.randomOffset.y + repulsion.y;
         const randomDist = Math.hypot(dx, dy);
 
-        if (randomDist < 0.01) return;
+        if (randomDist < 0.01) {
+          const randomAngle = Math.random() * Math.PI * 2;
+          dx = Math.cos(randomAngle) * 0.5;
+          dy = Math.sin(randomAngle) * 0.5;
+        }
 
         const moveX = (dx / randomDist) * m.speed * dt;
         const moveY = (dy / randomDist) * m.speed * dt;
