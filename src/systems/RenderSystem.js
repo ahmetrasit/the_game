@@ -69,6 +69,34 @@ export class RenderSystem {
       const padding = this.tileSize / 16;
       this.ctx.fillStyle = '#ff4444';
       this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+    } else if (entity.type === 'drone') {
+      // Draw drone as a small circle
+      const radius = this.tileSize / 6;
+      this.ctx.fillStyle = '#00ff88';
+      this.ctx.beginPath();
+      this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      // Draw drone outline
+      this.ctx.strokeStyle = '#ffffff';
+      this.ctx.lineWidth = 1;
+      this.ctx.beginPath();
+      this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
+      this.ctx.stroke();
+
+      // Draw line to target if moving
+      const droneComp = entity.get('Drone');
+      if (droneComp && droneComp.targetId) {
+        this.ctx.strokeStyle = '#00ff8844';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + this.tileSize / 2, y + this.tileSize / 2);
+        this.ctx.lineTo(
+          droneComp.targetX * this.tileSize + this.tileSize / 2,
+          droneComp.targetY * this.tileSize + this.tileSize / 2
+        );
+        this.ctx.stroke();
+      }
     } else if (entity.type === 'building') {
       const padding = this.tileSize / 16;
       const power = entity.get('Power');
@@ -96,6 +124,8 @@ export class RenderSystem {
         this.ctx.fillStyle = '#ffff00';
       } else if (entity.id.startsWith('storage')) {
         this.ctx.fillStyle = '#888888';
+      } else if (entity.id.startsWith('droneBay')) {
+        this.ctx.fillStyle = '#00ff88';
       } else {
         this.ctx.fillStyle = '#4444ff';
       }
@@ -242,6 +272,8 @@ export class RenderSystem {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ffff00';
     } else if (buildingType === 'storage') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#888888';
+    } else if (buildingType === 'droneBay') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#00ff88';
     } else if (buildingType === 'conveyor') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#666';
     }

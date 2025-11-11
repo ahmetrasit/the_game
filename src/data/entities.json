@@ -131,5 +131,18 @@
     "cost": {
       "ironPlates": 5
     }
+  },
+  "droneBay": {
+    "hp": 300,
+    "droneProductionTime": 15,
+    "droneCost": {
+      "ironPlates": 5,
+      "circuits": 2
+    },
+    "cost": {
+      "ironPlates": 40,
+      "copperPlates": 30,
+      "circuits": 10
+    }
   }
 }

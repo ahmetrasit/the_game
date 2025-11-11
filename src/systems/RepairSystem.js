@@ -16,8 +16,8 @@ export class RepairSystem {
 
       // Only repair if damaged
       if (health.current < health.max) {
-        // Repair 2 HP per second
-        health.current = Math.min(health.max, health.current + 2 * dt);
+        // Repair 3 HP every 5 seconds (0.6 HP/s)
+        health.current = Math.min(health.max, health.current + 0.6 * dt);
       }
     });
   }

@@ -11,6 +11,7 @@ import { ConveyorSystem } from './systems/ConveyorSystem';
 import { PowerSystem } from './systems/PowerSystem';
 import { PlayerControlSystem } from './systems/PlayerControlSystem';
 import { RepairSystem } from './systems/RepairSystem';
+import { DroneSystem } from './systems/DroneSystem';
 import { RenderSystem } from './systems/RenderSystem';
 import entitiesData from './data/entities.json';
 
@@ -28,6 +29,7 @@ class GameLoop {
       new ConveyorSystem(),
       new PlayerControlSystem(),
       new RepairSystem(),
+      new DroneSystem(),
       new RenderSystem(canvas)
     ];
     this.delta = 0;
@@ -324,6 +326,18 @@ function App() {
     wall5.add('Health', { current: 500, max: 500 });
     wall5.add('Equipment', {});
     useGame.getState().spawn(wall5);
+
+    // Starting drone bay
+    const droneBay = new Entity('droneBay1', 'building');
+    droneBay.x = 26;
+    droneBay.y = 22;
+    droneBay.add('Health', { current: 300, max: 300 });
+    droneBay.add('DroneBay', {
+      productionTime: 15,
+      productionProgress: 0
+    });
+    droneBay.add('Equipment', {});
+    useGame.getState().spawn(droneBay);
   }, []);
 
   useEffect(() => {
@@ -396,6 +410,11 @@ function App() {
           production: buildingData.powerProduction,
           consumption: 0,
           connected: true
+        });
+      } else if (state.selectedBuilding === 'droneBay') {
+        entity.add('DroneBay', {
+          productionTime: buildingData.droneProductionTime,
+          productionProgress: 0
         });
       } else if (state.selectedBuilding === 'conveyor') {
         const dir = getDirectionFromRotation(state.buildingRotation);
@@ -505,7 +524,7 @@ function App() {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun', 'generator', 'storage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
+            {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun', 'generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
               const data = entitiesData[type];
               if (!data) return null;
 
@@ -518,6 +537,7 @@ function App() {
                 if (t === 'ironRefinery') return 'IRON REFINERY';
                 if (t === 'copperRefinery') return 'COPPER REFINERY';
                 if (t === 'advancedAssembler') return 'ADV ASSEMBLER';
+                if (t === 'droneBay') return 'DRONE BAY';
                 return t.toUpperCase();
               };
 
