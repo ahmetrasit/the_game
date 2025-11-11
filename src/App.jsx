@@ -132,9 +132,16 @@ function App() {
   }, []);
 
   return (
-    <div style={{ textAlign: 'center', color: '#fff', fontFamily: 'monospace' }}>
-      <h1 style={{ margin: '10px 0' }}>Tower Defense Factory</h1>
-      <div style={{ marginBottom: '10px', fontSize: '14px' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      overflow: 'hidden',
+      color: '#fff',
+      fontFamily: 'monospace'
+    }}>
+      <h1 style={{ margin: '10px 0', textAlign: 'center' }}>Tower Defense Factory</h1>
+      <div style={{ marginBottom: '10px', fontSize: '14px', textAlign: 'center' }}>
         <span style={{ marginRight: '20px' }}>Iron: {resources.iron}</span>
         <span style={{ marginRight: '20px' }}>Copper: {resources.copper}</span>
         <span style={{ marginRight: '20px' }}>Entities: {entities.size}</span>
@@ -143,15 +150,30 @@ function App() {
         <span style={{ marginRight: '20px' }}>Time: {gameTime.toFixed(1)}s</span>
         <span>FPS: {gameRef.current?.getFPS() || 0}</span>
       </div>
-      <div style={{ marginBottom: '10px', fontSize: '12px', color: '#888' }}>
+      <div style={{ marginBottom: '10px', fontSize: '12px', color: '#888', textAlign: 'center' }}>
         Test Controls: Press [1] spawn 1 enemy | [2] spawn 20 enemies | [3] spawn 100 enemies
       </div>
-      <canvas
-        ref={canvasRef}
-        id="game"
-        width={1600}
-        height={1600}
-      />
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div style={{ flexShrink: 0 }}>
+          <canvas
+            ref={canvasRef}
+            id="game"
+            width={800}
+            height={800}
+          />
+        </div>
+        <div style={{
+          flex: 1,
+          border: '1px solid #444',
+          margin: '0 10px 10px 10px',
+          backgroundColor: '#111',
+          padding: '10px'
+        }}>
+          <div style={{ color: '#888', fontSize: '12px' }}>
+            Reserved for future features
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
