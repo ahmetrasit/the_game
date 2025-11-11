@@ -38,7 +38,8 @@ export class MovementSystem {
 
     state.entities.forEach(e => {
       const m = e.get('Movement');
-      if (!m?.path?.length) return;
+      if (!m) return;
+      if (!m.path || m.path.length === 0) return;
 
       const next = m.path[0];
       const dx = next.x - e.x;

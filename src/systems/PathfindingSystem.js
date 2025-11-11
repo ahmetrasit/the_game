@@ -9,7 +9,7 @@ export class PathfindingSystem {
       if (count >= 10 || e.type !== 'enemy') return;
 
       const m = e.get('Movement');
-      if (!m || m.path) return;
+      if (!m || (m.path && m.path.length > 0)) return;
 
       count++;
       m.path = this.astar({ x: Math.floor(e.x), y: Math.floor(e.y) }, m.target);
@@ -69,7 +69,7 @@ export class PathfindingSystem {
         const g = cur.g + d.cost;
         const h = Math.abs(n.x - goal.x) + Math.abs(n.y - goal.y);
         n.g = g;
-        n.f = g + h + Math.random() * 0.5;
+        n.f = g + h;
 
         if (!open.find(o => o.x === n.x && o.y === n.y)) {
           cameFrom[nk] = cur;

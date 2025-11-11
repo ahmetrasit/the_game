@@ -26,8 +26,12 @@ export const useGame = create((set, get) => ({
     newEntities.delete(id);
 
     const newGrid = state.grid.map(row => [...row]);
-    if (entity.x >= 0 && entity.x < 50 && entity.y >= 0 && entity.y < 50) {
-      newGrid[entity.y][entity.x] = null;
+    const gridX = Math.floor(entity.x);
+    const gridY = Math.floor(entity.y);
+    if (gridX >= 0 && gridX < 50 && gridY >= 0 && gridY < 50) {
+      if (newGrid[gridY][gridX] === id) {
+        newGrid[gridY][gridX] = null;
+      }
     }
 
     return { entities: newEntities, grid: newGrid };
