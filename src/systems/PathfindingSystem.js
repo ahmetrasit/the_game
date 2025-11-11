@@ -1,17 +1,36 @@
 import { useGame } from '../core/Game';
 
 export class PathfindingSystem {
+  constructor() {
+    this.recalcTimers = new Map();
+  }
+
   update(dt) {
     const state = useGame.getState();
     let count = 0;
 
     state.entities.forEach(e => {
-      if (count >= 10 || e.type !== 'enemy') return;
+      if (e.type !== 'enemy') return;
 
       const m = e.get('Movement');
-      if (!m || (m.path && m.path.length > 0)) return;
+      if (!m) return;
+
+      // Initialize recalc timer if needed
+      if (!this.recalcTimers.has(e.id)) {
+        this.recalcTimers.set(e.id, 0);
+      }
+
+      // Update recalc timer
+      const timer = this.recalcTimers.get(e.id) + dt;
+      this.recalcTimers.set(e.id, timer);
+
+      // Recalculate path if: no path, reached end, or timer expired (every 2 seconds to update target)
+      const shouldRecalc = !m.path || m.path.length === 0 || timer >= 2.0;
+
+      if (!shouldRecalc || count >= 10) return;
 
       count++;
+      this.recalcTimers.set(e.id, 0); // Reset timer
 
       // Find nearest building to attack
       let nearestBuilding = null;
@@ -30,6 +49,18 @@ export class PathfindingSystem {
       // If found a building, path to it; otherwise use original target
       const target = nearestBuilding ? { x: Math.floor(nearestBuilding.x), y: Math.floor(nearestBuilding.y) } : m.target;
       m.path = this.astar({ x: Math.floor(e.x), y: Math.floor(e.y) }, target);
+    });
+
+    // Clean up timers for removed enemies
+    const enemyIds = new Set();
+    state.entities.forEach(e => {
+      if (e.type === 'enemy') enemyIds.add(e.id);
+    });
+
+    this.recalcTimers.forEach((_, id) => {
+      if (!enemyIds.has(id)) {
+        this.recalcTimers.delete(id);
+      }
     });
   }
 
