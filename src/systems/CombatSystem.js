@@ -2,8 +2,9 @@ import { useGame } from '../core/Game';
 import { Entity } from '../core/Entity';
 
 export class CombatSystem {
-  constructor() {
+  constructor(particleSystem) {
     this.projectileId = 0;
+    this.particleSystem = particleSystem;
   }
 
   update(dt) {
@@ -83,6 +84,16 @@ export class CombatSystem {
     });
 
     state.spawn(projectile);
+
+    // Create muzzle flash effect
+    if (this.particleSystem) {
+      this.particleSystem.createMuzzleFlash(
+        source.x + 0.5,
+        source.y + 0.5,
+        target.x + 0.5,
+        target.y + 0.5
+      );
+    }
   }
 
   findEnemyTarget(entity, range) {

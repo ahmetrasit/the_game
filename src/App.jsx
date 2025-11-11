@@ -16,6 +16,7 @@ import { DroneSystem } from './systems/DroneSystem';
 import { CollectorCarSystem } from './systems/CollectorCarSystem';
 import { UpgradeSystem } from './systems/UpgradeSystem';
 import { DeckShuffleSystem } from './systems/DeckShuffleSystem';
+import { ParticleSystem } from './systems/ParticleSystem';
 import { RenderSystem } from './systems/RenderSystem';
 import entitiesData from './data/entities.json';
 import modifiersData from './data/modifiers.json';
@@ -24,12 +25,14 @@ class GameLoop {
   constructor(canvas) {
     this.waveSystem = new WaveSystem();
     this.deckShuffleSystem = new DeckShuffleSystem();
+    this.particleSystem = new ParticleSystem();
+    this.renderSystem = new RenderSystem(canvas, this.particleSystem);
     this.systems = [
       this.waveSystem,
       new PathfindingSystem(),
       new MovementSystem(),
-      new CombatSystem(),
-      new ProjectileSystem(),
+      new CombatSystem(this.particleSystem),
+      new ProjectileSystem(this.particleSystem),
       new PowerSystem(),
       new ProductionSystem(),
       new ConveyorSystem(),
@@ -39,7 +42,8 @@ class GameLoop {
       new CollectorCarSystem(),
       new UpgradeSystem(),
       this.deckShuffleSystem,
-      new RenderSystem(canvas)
+      this.particleSystem,
+      this.renderSystem
     ];
     this.delta = 0;
     this.last = 0;

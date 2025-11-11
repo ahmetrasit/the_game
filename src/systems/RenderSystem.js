@@ -1,18 +1,21 @@
 import { useGame } from '../core/Game';
 
 export class RenderSystem {
-  constructor(canvas) {
+  constructor(canvas, particleSystem) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.tileSize = canvas.width / 50;
     this.hoverTile = null;
+    this.time = 0; // For animations
+    this.particleSystem = particleSystem;
   }
 
   setHoverTile(x, y) {
     this.hoverTile = { x, y };
   }
 
-  update() {
+  update(dt) {
+    this.time += dt || 0.016; // Track time for animations
     const state = useGame.getState();
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -23,6 +26,11 @@ export class RenderSystem {
       this.drawEntity(entity);
       this.drawHealthBar(entity);
     });
+
+    // Render particles
+    if (this.particleSystem) {
+      this.particleSystem.render(this.ctx, this.tileSize, 0, 0);
+    }
 
     if (state.selectedBuilding && this.hoverTile) {
       this.drawPlacementPreview(this.hoverTile.x, this.hoverTile.y, state.selectedBuilding, state.buildingRotation, state.grid);
@@ -98,8 +106,16 @@ export class RenderSystem {
         this.ctx.stroke();
       }
     } else if (entity.type === 'collectorCar') {
-      // Draw collector car as a small square
+      // Draw collector car as a small square with direction indicator
       const size = this.tileSize / 3;
+      const carComp = entity.get('CollectorCar');
+
+      // Add shadow
+      this.ctx.shadowBlur = 4;
+      this.ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      this.ctx.shadowOffsetX = 2;
+      this.ctx.shadowOffsetY = 2;
+
       this.ctx.fillStyle = '#ffaa00';
       this.ctx.fillRect(
         x + this.tileSize / 2 - size / 2,
@@ -107,6 +123,10 @@ export class RenderSystem {
         size,
         size
       );
+
+      this.ctx.shadowBlur = 0;
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
 
       // Draw outline
       this.ctx.strokeStyle = '#ffffff';
@@ -118,19 +138,71 @@ export class RenderSystem {
         size
       );
 
-      // Draw indicator if carrying resources
-      const carComp = entity.get('CollectorCar');
-      if (carComp && carComp.carrying) {
-        this.ctx.fillStyle = '#00ff00';
-        this.ctx.beginPath();
-        this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2 - size / 2 - 3, 3, 0, Math.PI * 2);
-        this.ctx.fill();
+      // Draw direction indicator (triangle pointing in movement direction)
+      if (carComp) {
+        let targetX = null, targetY = null;
+        if (carComp.state === 'collecting' && carComp.targetId) {
+          const target = useGame.getState().entities.get(carComp.targetId);
+          if (target) {
+            targetX = target.x;
+            targetY = target.y;
+          }
+        } else if (carComp.state === 'returning') {
+          // Find nearest storage
+          const state = useGame.getState();
+          state.entities.forEach(e => {
+            if (e.id.startsWith('storage')) {
+              if (!targetX) {
+                targetX = e.x;
+                targetY = e.y;
+              }
+            }
+          });
+        }
+
+        if (targetX !== null && targetY !== null) {
+          const angle = Math.atan2(targetY - entity.y, targetX - entity.x);
+          const cx = x + this.tileSize / 2;
+          const cy = y + this.tileSize / 2;
+          const arrowSize = size / 4;
+
+          this.ctx.fillStyle = '#ffffff';
+          this.ctx.beginPath();
+          this.ctx.moveTo(
+            cx + Math.cos(angle) * arrowSize,
+            cy + Math.sin(angle) * arrowSize
+          );
+          this.ctx.lineTo(
+            cx + Math.cos(angle + 2.5) * arrowSize * 0.6,
+            cy + Math.sin(angle + 2.5) * arrowSize * 0.6
+          );
+          this.ctx.lineTo(
+            cx + Math.cos(angle - 2.5) * arrowSize * 0.6,
+            cy + Math.sin(angle - 2.5) * arrowSize * 0.6
+          );
+          this.ctx.closePath();
+          this.ctx.fill();
+        }
+
+        // Draw indicator if carrying resources
+        if (carComp.carrying) {
+          this.ctx.fillStyle = '#00ff00';
+          this.ctx.shadowBlur = 6;
+          this.ctx.shadowColor = '#00ff00';
+          this.ctx.beginPath();
+          this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2 - size / 2 - 4, 4, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.shadowBlur = 0;
+        }
       }
     } else if (entity.type === 'resourceDrop') {
-      // Draw resource drop as a small colored circle
+      // Draw resource drop as a small colored circle with pulsing animation
       const dropComp = entity.get('ResourceDrop');
       if (dropComp) {
-        const radius = this.tileSize / 8;
+        // Pulsing effect
+        const pulse = Math.sin(this.time * 4) * 0.2 + 1; // 0.8 to 1.2
+        const baseRadius = this.tileSize / 8;
+        const radius = baseRadius * pulse;
 
         // Color based on resource type
         if (dropComp.resourceType === 'iron') {
@@ -145,16 +217,33 @@ export class RenderSystem {
           this.ctx.fillStyle = '#ffffff';
         }
 
-        this.ctx.beginPath();
-        this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
-        this.ctx.fill();
+        const centerX = x + this.tileSize / 2;
+        const centerY = y + this.tileSize / 2;
 
-        // Draw glow
+        // Draw outer glow ring
+        this.ctx.globalAlpha = 0.3 * pulse;
+        this.ctx.shadowBlur = radius * 2;
+        this.ctx.shadowColor = this.ctx.fillStyle;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius * 1.5, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.globalAlpha = 1;
+
+        // Draw main circle
         this.ctx.shadowBlur = radius;
         this.ctx.shadowColor = this.ctx.fillStyle;
         this.ctx.beginPath();
-        this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         this.ctx.fill();
+
+        // Draw bright center
+        this.ctx.shadowBlur = 0;
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.globalAlpha = 0.6;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius * 0.4, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.globalAlpha = 1;
         this.ctx.shadowBlur = 0;
       }
     } else if (entity.type === 'building') {
@@ -192,11 +281,44 @@ export class RenderSystem {
         this.ctx.fillStyle = '#4444ff';
       }
 
+      // Add shadow for depth
+      this.ctx.shadowBlur = 6;
+      this.ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      this.ctx.shadowOffsetX = 3;
+      this.ctx.shadowOffsetY = 3;
+
       this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
 
+      // Reset shadow
+      this.ctx.shadowBlur = 0;
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
+
+      // Add highlight to top for 3D effect
+      const gradient = this.ctx.createLinearGradient(
+        x + padding,
+        y + padding,
+        x + padding,
+        y + this.tileSize - padding
+      );
+      gradient.addColorStop(0, 'rgba(255,255,255,0.3)');
+      gradient.addColorStop(0.5, 'rgba(255,255,255,0)');
+      gradient.addColorStop(1, 'rgba(0,0,0,0.2)');
+      this.ctx.fillStyle = gradient;
+      this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+
+      // Power indicator ring
       if (power && !isPowered) {
         this.ctx.strokeStyle = '#ff0000';
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 3;
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowColor = '#ff0000';
+        this.ctx.strokeRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+        this.ctx.shadowBlur = 0;
+      } else if (power && power.connected) {
+        // Subtle green outline for powered buildings
+        this.ctx.strokeStyle = 'rgba(74, 222, 128, 0.3)';
+        this.ctx.lineWidth = 1;
         this.ctx.strokeRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
       }
 

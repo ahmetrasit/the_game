@@ -2,6 +2,10 @@ import { useGame } from '../core/Game';
 import { Entity } from '../core/Entity';
 
 export class ProjectileSystem {
+  constructor(particleSystem) {
+    this.particleSystem = particleSystem;
+  }
+
   update(dt) {
     const state = useGame.getState();
     const projectilesToRemove = [];
@@ -25,13 +29,31 @@ export class ProjectileSystem {
         const dist = Math.hypot(dx, dy);
 
         if (dist < 0.5) {
-          // Hit the target
+          // Hit the target - create impact effect
+          if (this.particleSystem) {
+            this.particleSystem.createImpact(
+              projectile.x + 0.5,
+              projectile.y + 0.5,
+              '#ffaa00'
+            );
+          }
+
           const targetHealth = target.get('Health');
           if (targetHealth) {
             targetHealth.current -= proj.damage;
 
             if (targetHealth.current <= 0) {
               if (target.type === 'enemy') {
+                // Create explosion effect for enemy death
+                if (this.particleSystem) {
+                  this.particleSystem.createExplosion(
+                    target.x + 0.5,
+                    target.y + 0.5,
+                    '#ff4444',
+                    15
+                  );
+                }
+
                 // Spawn resource drops on the ground
                 const dropX = target.x;
                 const dropY = target.y;
