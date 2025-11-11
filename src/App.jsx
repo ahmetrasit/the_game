@@ -364,7 +364,11 @@ function App() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.log('[useEffect] Canvas not found!');
+      return;
+    }
+    console.log('[useEffect] Canvas found, setting up event listeners');
 
     const handleMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -377,6 +381,7 @@ function App() {
     };
 
     const handleMouseClick = (e) => {
+      console.log('[handleMouseClick] TRIGGERED - click event received');
       const state = useGame.getState();
       console.log('[handleMouseClick] selectedBuilding:', state.selectedBuilding);
       if (!state.selectedBuilding) return;
@@ -487,11 +492,13 @@ function App() {
       }
     };
 
+    console.log('[useEffect] Attaching event listeners to canvas', canvas);
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('click', handleMouseClick);
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      console.log('[useEffect] Removing event listeners from canvas');
       canvas.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('click', handleMouseClick);
       window.removeEventListener('keydown', handleKeyDown);
