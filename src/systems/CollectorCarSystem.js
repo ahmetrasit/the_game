@@ -24,13 +24,14 @@ export class CollectorCarSystem {
       const carComp = car.get('CollectorCar');
       if (!carComp) return;
 
-      // If car is destroyed, respawn it from garage
+      // If car is destroyed, remove it and allow respawn from garage
       const health = car.get('Health');
       if (health && health.current <= 0) {
         const garage = state.entities.get(carComp.garageId);
         if (garage) {
           this.spawnedCars.delete(carComp.garageId);
         }
+        state.remove(car.id);
         return;
       }
 

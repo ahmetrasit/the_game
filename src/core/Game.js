@@ -41,8 +41,12 @@ export const useGame = create((set, get) => ({
     const newEntities = new Map(state.entities);
     newEntities.set(entity.id, entity);
     const newGrid = state.grid.map(row => [...row]);
-    if (entity.x >= 0 && entity.x < 50 && entity.y >= 0 && entity.y < 50) {
-      newGrid[entity.y][entity.x] = entity.id;
+    // Only add buildings and conveyors to the grid (not mobile entities like cars, drops, enemies, projectiles, drones)
+    if ((entity.type === 'building' || entity.type === 'conveyor') &&
+        entity.x >= 0 && entity.x < 50 && entity.y >= 0 && entity.y < 50) {
+      const gridX = Math.floor(entity.x);
+      const gridY = Math.floor(entity.y);
+      newGrid[gridY][gridX] = entity.id;
     }
     return { entities: newEntities, grid: newGrid };
   }),
