@@ -121,8 +121,11 @@ export class MovementSystem {
       } else {
         const separation = this.calculateSeparation(e, state.entities);
 
-        const moveX = (dx / dist) * m.speed * dt + separation.x * dt;
-        const moveY = (dy / dist) * m.speed * dt + separation.y * dt;
+        // Apply global speed modifier (affects everything)
+        let finalSpeed = m.speed * (state.globalSpeedModifier || 1);
+
+        const moveX = (dx / dist) * finalSpeed * dt + separation.x * dt;
+        const moveY = (dy / dist) * finalSpeed * dt + separation.y * dt;
 
         const newPosX = e.x + moveX;
         const newPosY = e.y + moveY;

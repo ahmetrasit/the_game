@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import * as React from 'react';
 import { useGame } from './core/Game';
 import { Entity } from './core/Entity';
 import { PathfindingSystem } from './systems/PathfindingSystem';
@@ -13,12 +14,15 @@ import { PlayerControlSystem } from './systems/PlayerControlSystem';
 import { RepairSystem } from './systems/RepairSystem';
 import { DroneSystem } from './systems/DroneSystem';
 import { UpgradeSystem } from './systems/UpgradeSystem';
+import { DeckShuffleSystem } from './systems/DeckShuffleSystem';
 import { RenderSystem } from './systems/RenderSystem';
 import entitiesData from './data/entities.json';
+import modifiersData from './data/modifiers.json';
 
 class GameLoop {
   constructor(canvas) {
     this.waveSystem = new WaveSystem();
+    this.deckShuffleSystem = new DeckShuffleSystem();
     this.systems = [
       this.waveSystem,
       new PathfindingSystem(),
@@ -32,6 +36,7 @@ class GameLoop {
       new RepairSystem(),
       new DroneSystem(),
       new UpgradeSystem(),
+      this.deckShuffleSystem,
       new RenderSystem(canvas)
     ];
     this.delta = 0;
@@ -79,13 +84,17 @@ class GameLoop {
   getNextWaveTimer() {
     return (10 - this.waveSystem.timer).toFixed(1);
   }
+
+  getNextShuffleTimer() {
+    return this.deckShuffleSystem?.getTimeUntilShuffle()?.toFixed(1) || '30.0';
+  }
 }
 
 function App() {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const renderSystemRef = useRef(null);
-  const { resources, entities, gameTime, selectedBuilding, buildingRotation, gameOver, showUpgradeCards, rangeModifier, damageBonus, enemySpeedModifier } = useGame();
+  const { resources, entities, gameTime, selectedBuilding, buildingRotation, gameOver, showUpgradeCards, rangeModifier, damageBonus, enemySpeedModifier, gameStarted, currentHand, activeModifier, selectedDeck, deckShuffleTimer } = useGame();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -370,14 +379,17 @@ function App() {
       const buildingData = entitiesData[state.selectedBuilding];
       if (!buildingData || !buildingData.cost) return;
 
+      // Apply cost multiplier from modifier
+      const costMultiplier = state.activeModifier && modifiersData[state.activeModifier]?.effects?.costMultiplier || 1;
+
       const canAfford = Object.entries(buildingData.cost).every(
-        ([resource, amount]) => (state.resources[resource] || 0) >= amount
+        ([resource, amount]) => (state.resources[resource] || 0) >= Math.ceil(amount * costMultiplier)
       );
 
       if (!canAfford) return;
 
       Object.entries(buildingData.cost).forEach(([resource, amount]) => {
-        state.addResource(resource, -amount);
+        state.addResource(resource, -Math.ceil(amount * costMultiplier));
       });
 
       const entityType = state.selectedBuilding === 'conveyor' ? 'conveyor' : 'building';
@@ -385,12 +397,19 @@ function App() {
       entity.x = x;
       entity.y = y;
 
-      entity.add('Health', { current: buildingData.hp, max: buildingData.hp });
+      // Apply modifier effects for turrets
+      const modifierEffects = state.activeModifier && modifiersData[state.activeModifier]?.effects || {};
+      const isTurret = buildingData.damage && buildingData.range && buildingData.fireRate;
+      const hpMultiplier = isTurret && modifierEffects.turretHPMultiplier || 1;
+      const damageMultiplier = isTurret && modifierEffects.turretDamageMultiplier || 1;
+
+      const finalHP = Math.ceil(buildingData.hp * hpMultiplier);
+      entity.add('Health', { current: finalHP, max: finalHP });
       entity.add('Equipment', {});
 
-      if (buildingData.damage && buildingData.range && buildingData.fireRate) {
+      if (isTurret) {
         entity.add('Combat', {
-          damage: buildingData.damage,
+          damage: Math.ceil(buildingData.damage * damageMultiplier),
           range: buildingData.range,
           fireRate: buildingData.fireRate,
           timer: 0
@@ -408,8 +427,9 @@ function App() {
           connected: false
         });
       } else if (state.selectedBuilding === 'generator') {
+        const powerMultiplier = modifierEffects.powerMultiplier || 1;
         entity.add('Power', {
-          production: buildingData.powerProduction,
+          production: Math.ceil(buildingData.powerProduction * powerMultiplier),
           consumption: 0,
           connected: true
         });
@@ -461,6 +481,118 @@ function App() {
     }
   };
 
+  // Deck selection state
+  const [tempDeck, setTempDeck] = React.useState(['wall', 'turret', 'laserTurret', 'generator', 'storage', 'conveyor', 'ironRefinery', 'droneBay']);
+  const [tempModifier, setTempModifier] = React.useState('normal');
+
+  const handleStartGame = () => {
+    useGame.getState().startGame(tempDeck, tempModifier);
+    useGame.getState().shuffleDeck();
+  };
+
+  // Deck selection UI
+  if (!gameStarted) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        backgroundColor: '#111',
+        color: '#fff',
+        fontFamily: 'monospace'
+      }}>
+        <div style={{
+          backgroundColor: '#222',
+          border: '3px solid #4ade80',
+          padding: '40px',
+          borderRadius: '10px',
+          maxWidth: '800px',
+          maxHeight: '90vh',
+          overflow: 'auto'
+        }}>
+          <h1 style={{ color: '#4ade80', marginBottom: '20px' }}>BUILD YOUR DECK</h1>
+          <p style={{ color: '#888', marginBottom: '30px' }}>
+            Select 6-10 building types to use in this run. Your deck shuffles every 30s, revealing 4 random buildings.
+          </p>
+
+          <h3 style={{ color: '#fff', marginBottom: '15px' }}>Select Buildings ({tempDeck.length}/10)</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '30px' }}>
+            {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun', 'generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler'].map(type => {
+              const isSelected = tempDeck.includes(type);
+              return (
+                <button
+                  key={type}
+                  onClick={() => {
+                    if (isSelected) {
+                      setTempDeck(tempDeck.filter(t => t !== type));
+                    } else if (tempDeck.length < 10) {
+                      setTempDeck([...tempDeck, type]);
+                    }
+                  }}
+                  style={{
+                    padding: '15px',
+                    backgroundColor: isSelected ? '#4ade80' : '#333',
+                    border: '2px solid' + (isSelected ? '#4ade80' : '#555'),
+                    color: isSelected ? '#000' : '#fff',
+                    cursor: 'pointer',
+                    borderRadius: '5px',
+                    fontSize: '12px',
+                    fontWeight: isSelected ? 'bold' : 'normal'
+                  }}
+                >
+                  {type.toUpperCase()}
+                </button>
+              );
+            })}
+          </div>
+
+          <h3 style={{ color: '#fff', marginBottom: '15px' }}>Choose Modifier</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
+            {Object.entries(modifiersData).map(([key, mod]) => (
+              <button
+                key={key}
+                onClick={() => setTempModifier(key)}
+                style={{
+                  padding: '15px',
+                  backgroundColor: tempModifier === key ? '#4dabf7' : '#333',
+                  border: '2px solid ' + (tempModifier === key ? '#4dabf7' : '#555'),
+                  color: '#fff',
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                  textAlign: 'left'
+                }}
+              >
+                <div style={{ fontSize: '16px', marginBottom: '5px' }}>
+                  {mod.icon} <strong>{mod.name}</strong>
+                </div>
+                <div style={{ fontSize: '12px', color: '#aaa' }}>{mod.description}</div>
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={handleStartGame}
+            disabled={tempDeck.length < 6}
+            style={{
+              width: '100%',
+              padding: '20px',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              backgroundColor: tempDeck.length >= 6 ? '#4ade80' : '#555',
+              border: 'none',
+              borderRadius: '10px',
+              color: tempDeck.length >= 6 ? '#000' : '#888',
+              cursor: tempDeck.length >= 6 ? 'pointer' : 'not-allowed'
+            }}
+          >
+            START GAME {tempDeck.length >= 6 ? '' : `(Select at least 6 buildings)`}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       display: 'flex',
@@ -483,10 +615,16 @@ function App() {
       <div style={{ marginBottom: '10px', fontSize: '12px', textAlign: 'center', color: '#888' }}>
         <span style={{ marginRight: '20px' }}>Entities: {entities.size}</span>
         <span style={{ marginRight: '20px' }}>Wave: {gameRef.current?.getWaveNumber() || 0}</span>
-        <span style={{ marginRight: '20px' }}>Next: {gameRef.current?.getNextWaveTimer() || '10.0'}s</span>
+        <span style={{ marginRight: '20px' }}>Next Wave: {gameRef.current?.getNextWaveTimer() || '10.0'}s</span>
+        <span style={{ marginRight: '20px' }}>Next Shuffle: {gameRef.current?.getNextShuffleTimer() || '30.0'}s</span>
         <span style={{ marginRight: '20px' }}>Time: {gameTime.toFixed(1)}s</span>
         <span>FPS: {gameRef.current?.getFPS() || 0}</span>
       </div>
+      {activeModifier && modifiersData[activeModifier] && (
+        <div style={{ marginBottom: '10px', fontSize: '12px', textAlign: 'center', color: '#4dabf7' }}>
+          Modifier: {modifiersData[activeModifier].icon} {modifiersData[activeModifier].name}
+        </div>
+      )}
       <div style={{ marginBottom: '10px', fontSize: '12px', color: '#888', textAlign: 'center' }}>
         Test Controls: Press [1] spawn 1 enemy | [2] spawn 20 enemies | [3] spawn 100 enemies
       </div>
@@ -526,13 +664,14 @@ function App() {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {['wall', 'turret', 'laserTurret', 'cannon', 'sniperTurret', 'machineGun', 'generator', 'storage', 'droneBay', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
+            {currentHand.map(type => {
               const data = entitiesData[type];
               if (!data) return null;
 
               const isSelected = selectedBuilding === type;
+              const costMultiplier = activeModifier && modifiersData[activeModifier]?.effects?.costMultiplier || 1;
               const canAfford = data.cost && Object.entries(data.cost).every(
-                ([resource, amount]) => (resources[resource] || 0) >= amount
+                ([resource, amount]) => (resources[resource] || 0) >= Math.ceil(amount * costMultiplier)
               );
 
               const getDisplayName = (t) => {
@@ -564,7 +703,7 @@ function App() {
                   </div>
                   <div style={{ fontSize: '10px', color: '#888' }}>
                     {data.cost ? Object.entries(data.cost)
-                      .map(([r, a]) => `${a} ${r}`)
+                      .map(([r, a]) => `${Math.ceil(a * costMultiplier)} ${r}`)
                       .join(', ') : 'Free'}
                   </div>
                   {type === 'turret' && (

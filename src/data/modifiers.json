@@ -1,0 +1,49 @@
+{
+  "slowmo": {
+    "name": "Slow Motion",
+    "description": "Everything (including your units) moves 30% slower",
+    "icon": "🐌",
+    "effects": {
+      "globalSpeedModifier": 0.7
+    }
+  },
+  "expensive": {
+    "name": "Economic Crisis",
+    "description": "All buildings cost 50% more resources",
+    "icon": "💰",
+    "effects": {
+      "costMultiplier": 1.5
+    }
+  },
+  "fastEnemies": {
+    "name": "Adrenaline Rush",
+    "description": "Enemies move 40% faster",
+    "icon": "⚡",
+    "effects": {
+      "enemySpeedBonus": 1.4
+    }
+  },
+  "limitedPower": {
+    "name": "Power Shortage",
+    "description": "Generators produce 50% less power",
+    "icon": "🔋",
+    "effects": {
+      "powerMultiplier": 0.5
+    }
+  },
+  "glassCanon": {
+    "name": "Glass Cannon",
+    "description": "Turrets deal 50% more damage but have 30% less HP",
+    "icon": "💥",
+    "effects": {
+      "turretDamageMultiplier": 1.5,
+      "turretHPMultiplier": 0.7
+    }
+  },
+  "normal": {
+    "name": "Standard Mode",
+    "description": "No special modifiers",
+    "icon": "⭐",
+    "effects": {}
+  }
+}

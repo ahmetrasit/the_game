@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import modifiersData from '../data/modifiers.json';
 
 export const useGame = create((set, get) => ({
   entities: new Map(),
@@ -24,6 +25,15 @@ export const useGame = create((set, get) => ({
   rangeModifier: 1.0, // +5% per upgrade
   damageBonus: 0, // +10 per upgrade
   enemySpeedModifier: 1.0, // -15% per upgrade (0.85)
+
+  // Deck building system
+  gameStarted: false,
+  selectedDeck: [],
+  currentHand: [],
+  activeModifier: null,
+  deckShuffleTimer: 0,
+  globalSpeedModifier: 1.0,
+  enemySpeedBonus: 1.0,
 
   showUpgradeCards: false,
 
@@ -82,6 +92,26 @@ export const useGame = create((set, get) => ({
   },
 
   setShowUpgradeCards: (show) => set({ showUpgradeCards: show }),
+
+  startGame: (deck, modifier) => {
+    const modifierEffects = modifiersData[modifier]?.effects || {};
+    set({
+      gameStarted: true,
+      selectedDeck: deck,
+      activeModifier: modifier,
+      currentHand: [],
+      deckShuffleTimer: 0,
+      globalSpeedModifier: modifierEffects.globalSpeedModifier || 1.0,
+      enemySpeedBonus: modifierEffects.enemySpeedBonus || 1.0
+    });
+  },
+
+  shuffleDeck: () => {
+    const state = get();
+    const shuffled = [...state.selectedDeck].sort(() => Math.random() - 0.5);
+    const handSize = Math.min(4, shuffled.length);
+    set({ currentHand: shuffled.slice(0, handSize) });
+  },
 
   applyUpgrade: (type) => set((state) => {
     const updates = { showUpgradeCards: false };

@@ -32,8 +32,12 @@ export class WaveSystem {
     const hp = Math.floor(baseHP * Math.pow(1.1, this.waveNumber - 1));
     // +5% speed per wave
     const baseSpeedScaled = baseSpeed * Math.pow(1.05, this.waveNumber - 1);
-    // Apply global enemy speed modifier
-    const speed = baseSpeedScaled * (state.enemySpeedModifier || 1);
+    // Apply enemy speed modifier from upgrades (slows enemies)
+    const speedWithUpgrade = baseSpeedScaled * (state.enemySpeedModifier || 1);
+    // Apply enemy speed bonus from modifier (fastEnemies modifier)
+    const speedWithBonus = speedWithUpgrade * (state.enemySpeedBonus || 1);
+    // Apply global speed modifier (affects everything)
+    const speed = speedWithBonus * (state.globalSpeedModifier || 1);
     // +5% damage per wave
     const damage = Math.floor(baseDamage * Math.pow(1.05, this.waveNumber - 1));
 
