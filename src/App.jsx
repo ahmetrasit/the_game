@@ -564,6 +564,11 @@ function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    let isDragging = false;
+    let draggedBuilding = null;
+    let dragStartX = null;
+    let dragStartY = null;
+
     const handleMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) / (canvas.width / 50));
@@ -572,6 +577,116 @@ function App() {
       if (x >= 0 && x < 50 && y >= 0 && y < 50 && renderSystemRef.current) {
         renderSystemRef.current.setHoverTile(x, y);
       }
+
+      // Handle dragging building
+      if (isDragging && draggedBuilding && (x !== dragStartX || y !== dragStartY)) {
+        const state = useGame.getState();
+
+        // Check if target position is valid
+        if (x >= 0 && x < 50 && y >= 0 && y < 50) {
+          const occupant = state.grid[y][x];
+
+          // Can only move to empty space
+          if (!occupant || occupant === draggedBuilding.id) {
+            // Move the building
+            draggedBuilding.x = x;
+            draggedBuilding.y = y;
+
+            // Update grid
+            const newGrid = state.grid.map(row => [...row]);
+
+            // Clear old position
+            if (dragStartX !== null && dragStartY !== null) {
+              if (newGrid[dragStartY][dragStartX] === draggedBuilding.id) {
+                newGrid[dragStartY][dragStartX] = null;
+              }
+            }
+
+            // Set new position
+            newGrid[y][x] = draggedBuilding.id;
+
+            useGame.setState({ grid: newGrid });
+            dragStartX = x;
+            dragStartY = y;
+          }
+        }
+      }
+    };
+
+    const handleMouseDown = (e) => {
+      const state = useGame.getState();
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) / (canvas.width / 50));
+      const y = Math.floor((e.clientY - rect.top) / (canvas.height / 50));
+
+      if (x < 0 || x >= 50 || y < 0 || y >= 50) return;
+
+      // Right click - delete building
+      if (e.button === 2) {
+        e.preventDefault();
+        const buildingId = state.grid[y][x];
+        if (!buildingId) return;
+
+        const building = state.entities.get(buildingId);
+        if (!building || building.type !== 'building' && building.type !== 'conveyor') return;
+
+        // Get building type from ID
+        const buildingType = building.id.split('_')[0];
+        const buildingData = entitiesData[buildingType];
+
+        if (buildingData && buildingData.cost) {
+          // Refund 65-80% of resources
+          const refundPercent = 0.65 + Math.random() * 0.15; // Random between 65-80%
+
+          Object.entries(buildingData.cost).forEach(([resource, amount]) => {
+            const refund = Math.floor(amount * refundPercent);
+            state.addResource(resource, refund);
+          });
+        }
+
+        // Remove the building
+        state.remove(buildingId);
+        return;
+      }
+
+      // Left click - place new building or start dragging existing
+      if (e.button === 0) {
+        const buildingId = state.grid[y][x];
+
+        // If clicking on existing building, start drag
+        if (buildingId && !state.selectedBuilding) {
+          const building = state.entities.get(buildingId);
+
+          // Only allow dragging buildings and conveyors (not enemies, projectiles, etc.)
+          if (building && (building.type === 'building' || building.type === 'conveyor')) {
+            // Don't allow dragging the player turret
+            if (building.id === 't1') return;
+
+            isDragging = true;
+            draggedBuilding = building;
+            dragStartX = x;
+            dragStartY = y;
+          }
+          return;
+        }
+
+        // If no building selected, do nothing
+        if (!state.selectedBuilding) return;
+
+        // Place new building
+        handleMouseClick(e);
+      }
+    };
+
+    const handleMouseUp = (e) => {
+      isDragging = false;
+      draggedBuilding = null;
+      dragStartX = null;
+      dragStartY = null;
+    };
+
+    const handleContextMenu = (e) => {
+      e.preventDefault(); // Prevent context menu from appearing
     };
 
     const handleMouseClick = (e) => {
@@ -672,12 +787,16 @@ function App() {
     };
 
     canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('click', handleMouseClick);
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('contextmenu', handleContextMenu);
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('click', handleMouseClick);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('contextmenu', handleContextMenu);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [gameStarted]); // Run when gameStarted changes so canvas exists
