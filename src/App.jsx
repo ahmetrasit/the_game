@@ -6,6 +6,9 @@ import { MovementSystem } from './systems/MovementSystem';
 import { WaveSystem } from './systems/WaveSystem';
 import { CombatSystem } from './systems/CombatSystem';
 import { ProjectileSystem } from './systems/ProjectileSystem';
+import { ProductionSystem } from './systems/ProductionSystem';
+import { ConveyorSystem } from './systems/ConveyorSystem';
+import { PowerSystem } from './systems/PowerSystem';
 import { RenderSystem } from './systems/RenderSystem';
 
 class GameLoop {
@@ -17,6 +20,9 @@ class GameLoop {
       new MovementSystem(),
       new CombatSystem(),
       new ProjectileSystem(),
+      new PowerSystem(),
+      new ProductionSystem(),
+      new ConveyorSystem(),
       new RenderSystem(canvas)
     ];
     this.delta = 0;
@@ -129,6 +135,48 @@ function App() {
     turret.add('Combat', { damage: 25, range: 15, fireRate: 3, timer: 0 });
     turret.add('Equipment', {});
     useGame.getState().spawn(turret);
+
+    const generator = new Entity('generator1', 'building');
+    generator.x = 20;
+    generator.y = 20;
+    generator.add('Health', { current: 150, max: 150 });
+    generator.add('Power', { production: 20, consumption: 0, connected: true });
+    generator.add('Equipment', {});
+    useGame.getState().spawn(generator);
+
+    const refinery = new Entity('refinery1', 'building');
+    refinery.x = 22;
+    refinery.y = 20;
+    refinery.add('Health', { current: 200, max: 200 });
+    refinery.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
+    refinery.add('Power', { production: 0, consumption: 5, connected: false });
+    refinery.add('Equipment', {});
+    useGame.getState().spawn(refinery);
+
+    const conveyor1 = new Entity('conveyor1', 'conveyor');
+    conveyor1.x = 23;
+    conveyor1.y = 20;
+    conveyor1.add('Health', { current: 50, max: 50 });
+    conveyor1.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
+    conveyor1.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor1.add('Equipment', {});
+    useGame.getState().spawn(conveyor1);
+
+    const conveyor2 = new Entity('conveyor2', 'conveyor');
+    conveyor2.x = 24;
+    conveyor2.y = 20;
+    conveyor2.add('Health', { current: 50, max: 50 });
+    conveyor2.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
+    conveyor2.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor2.add('Equipment', {});
+    useGame.getState().spawn(conveyor2);
+
+    const storage = new Entity('storage1', 'building');
+    storage.x = 25;
+    storage.y = 20;
+    storage.add('Health', { current: 100, max: 100 });
+    storage.add('Equipment', {});
+    useGame.getState().spawn(storage);
   }, []);
 
   return (
@@ -142,8 +190,10 @@ function App() {
     }}>
       <h1 style={{ margin: '10px 0', textAlign: 'center' }}>Tower Defense Factory</h1>
       <div style={{ marginBottom: '10px', fontSize: '14px', textAlign: 'center' }}>
-        <span style={{ marginRight: '20px' }}>Iron: {resources.iron}</span>
-        <span style={{ marginRight: '20px' }}>Copper: {resources.copper}</span>
+        <span style={{ marginRight: '20px' }}>Iron: {resources.iron || 0}</span>
+        <span style={{ marginRight: '20px' }}>Copper: {resources.copper || 0}</span>
+        <span style={{ marginRight: '20px' }}>Iron Plates: {resources.ironPlates || 0}</span>
+        <span style={{ marginRight: '20px' }}>Copper Plates: {resources.copperPlates || 0}</span>
         <span style={{ marginRight: '20px' }}>Entities: {entities.size}</span>
         <span style={{ marginRight: '20px' }}>Wave: {gameRef.current?.getWaveNumber() || 0}</span>
         <span style={{ marginRight: '20px' }}>Next: {gameRef.current?.getNextWaveTimer() || '10.0'}s</span>

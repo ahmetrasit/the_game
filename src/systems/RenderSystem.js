@@ -44,14 +44,12 @@ export class RenderSystem {
     const y = entity.y * this.tileSize;
 
     if (entity.type === 'projectile') {
-      // Draw projectile as a bright yellow circle
-      const radius = this.tileSize / 5; // Scale with tile size
+      const radius = this.tileSize / 5;
       this.ctx.fillStyle = '#ffff00';
       this.ctx.beginPath();
       this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
       this.ctx.fill();
 
-      // Add glow effect
       this.ctx.shadowBlur = radius * 2;
       this.ctx.shadowColor = '#ffff00';
       this.ctx.beginPath();
@@ -59,13 +57,68 @@ export class RenderSystem {
       this.ctx.fill();
       this.ctx.shadowBlur = 0;
     } else if (entity.type === 'enemy') {
-      const padding = this.tileSize / 16; // Scale padding with tile size
+      const padding = this.tileSize / 16;
       this.ctx.fillStyle = '#ff4444';
       this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
     } else if (entity.type === 'building') {
       const padding = this.tileSize / 16;
-      this.ctx.fillStyle = '#4444ff';
+      const power = entity.get('Power');
+      const isPowered = !power || power.connected;
+
+      if (entity.id.startsWith('refinery')) {
+        this.ctx.fillStyle = isPowered ? '#ff8800' : '#662200';
+      } else if (entity.id.startsWith('generator')) {
+        this.ctx.fillStyle = '#ffff00';
+      } else if (entity.id.startsWith('storage')) {
+        this.ctx.fillStyle = '#888888';
+      } else {
+        this.ctx.fillStyle = '#4444ff';
+      }
+
       this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+
+      if (power && !isPowered) {
+        this.ctx.strokeStyle = '#ff0000';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+      }
+    } else if (entity.type === 'conveyor') {
+      const padding = this.tileSize / 16;
+      const power = entity.get('Power');
+      const isPowered = !power || power.connected;
+
+      this.ctx.fillStyle = isPowered ? '#666' : '#333';
+      this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+
+      const conv = entity.get('Conveyor');
+      if (conv?.dir) {
+        this.ctx.strokeStyle = isPowered ? '#aaa' : '#555';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        const cx = x + this.tileSize / 2;
+        const cy = y + this.tileSize / 2;
+        const arrowLen = this.tileSize / 3;
+        this.ctx.moveTo(cx - conv.dir.x * arrowLen, cy - conv.dir.y * arrowLen);
+        this.ctx.lineTo(cx + conv.dir.x * arrowLen, cy + conv.dir.y * arrowLen);
+        this.ctx.stroke();
+      }
+
+      if (conv?.items) {
+        conv.items.forEach(item => {
+          const itemX = x + item.pos * this.tileSize * (conv.dir?.x || 1);
+          const itemY = y + item.pos * this.tileSize * (conv.dir?.y || 0);
+          const itemSize = this.tileSize / 4;
+
+          this.ctx.fillStyle = item.type === 'iron' ? '#888' :
+                               item.type === 'copper' ? '#ff8844' :
+                               item.type === 'ironPlates' ? '#aaa' :
+                               item.type === 'copperPlates' ? '#ffaa66' : '#fff';
+
+          this.ctx.fillRect(itemX + this.tileSize / 2 - itemSize / 2,
+                           itemY + this.tileSize / 2 - itemSize / 2,
+                           itemSize, itemSize);
+        });
+      }
     } else {
       const padding = this.tileSize / 16;
       this.ctx.fillStyle = '#888';

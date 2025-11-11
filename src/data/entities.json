@@ -16,5 +16,38 @@
       "iron": 2,
       "copper": 1
     }
+  },
+  "refinery": {
+    "hp": 200,
+    "recipe": "ironPlates",
+    "productionTime": 2,
+    "powerConsumption": 5,
+    "cost": {
+      "iron": 20,
+      "copper": 10
+    }
+  },
+  "storage": {
+    "hp": 100,
+    "capacity": 1000,
+    "cost": {
+      "iron": 10
+    }
+  },
+  "generator": {
+    "hp": 150,
+    "powerProduction": 20,
+    "cost": {
+      "iron": 30,
+      "copper": 20
+    }
+  },
+  "conveyor": {
+    "hp": 50,
+    "speed": 1,
+    "powerConsumption": 1,
+    "cost": {
+      "iron": 5
+    }
   }
 }

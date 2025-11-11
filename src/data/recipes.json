@@ -1,0 +1,12 @@
+{
+  "ironPlates": {
+    "inputs": [{"type": "iron", "amount": 2}],
+    "outputs": [{"type": "ironPlates", "amount": 1}],
+    "time": 2
+  },
+  "copperPlates": {
+    "inputs": [{"type": "copper", "amount": 3}],
+    "outputs": [{"type": "copperPlates", "amount": 1}],
+    "time": 2
+  }
+}
