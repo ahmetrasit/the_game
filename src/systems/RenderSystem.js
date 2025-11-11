@@ -5,19 +5,10 @@ export class RenderSystem {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.tileSize = 32;
-    this.debugLogged = false;
   }
 
   update() {
     const state = useGame.getState();
-
-    if (!this.debugLogged && state.entities.size > 0) {
-      console.log('RenderSystem - Drawing entities:', state.entities.size);
-      state.entities.forEach(entity => {
-        console.log(`  - ${entity.type} at (${entity.x}, ${entity.y})`);
-      });
-      this.debugLogged = true;
-    }
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 

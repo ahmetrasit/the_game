@@ -57,8 +57,6 @@ function App() {
   useEffect(() => {
     if (!canvasRef.current || gameRef.current) return;
 
-    console.log('Initializing game...');
-
     const game = new GameLoop(canvasRef.current);
     gameRef.current = game;
     game.start();
@@ -69,20 +67,12 @@ function App() {
     turret.add('Health', { current: 300, max: 300 });
     turret.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
     useGame.getState().spawn(turret);
-    console.log('Spawned turret:', turret);
 
     const scout = new Entity('e1', 'enemy');
     scout.x = 30;
     scout.y = 30;
     scout.add('Health', { current: 50, max: 50 });
     useGame.getState().spawn(scout);
-    console.log('Spawned enemy:', scout);
-
-    setTimeout(() => {
-      const state = useGame.getState();
-      console.log('Entities in store:', Array.from(state.entities.values()));
-      console.log('Total entities:', state.entities.size);
-    }, 100);
   }, []);
 
   return (
