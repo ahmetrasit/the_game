@@ -82,10 +82,7 @@ export const useGame = create((set, get) => ({
 
   setGameOver: () => set({ gameOver: true, isPaused: true }),
 
-  selectBuilding: (type) => {
-    console.log('[selectBuilding] type:', type);
-    set({ selectedBuilding: type, buildingRotation: 0 });
-  },
+  selectBuilding: (type) => set({ selectedBuilding: type, buildingRotation: 0 }),
 
   rotateBuilding: () => set((state) => ({
     buildingRotation: (state.buildingRotation + 90) % 360
@@ -115,7 +112,6 @@ export const useGame = create((set, get) => ({
 
   shuffleDeck: () => {
     const state = get();
-    console.log('[shuffleDeck] selectedDeck:', state.selectedDeck);
     // All infrastructure buildings
     const allInfrastructure = ['generator', 'storage', 'droneBay', 'carGarage', 'conveyor', 'ironRefinery', 'copperRefinery', 'assembler', 'advancedAssembler'];
 
@@ -128,9 +124,7 @@ export const useGame = create((set, get) => ({
     const weaponHand = shuffledWeapons.slice(0, 1);
 
     // 3 infrastructure + 1 weapon
-    const newHand = [...infraHand, ...weaponHand];
-    console.log('[shuffleDeck] new currentHand:', newHand);
-    set({ currentHand: newHand });
+    set({ currentHand: [...infraHand, ...weaponHand] });
   },
 
   applyUpgrade: (type) => set((state) => {

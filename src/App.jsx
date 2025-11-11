@@ -364,11 +364,7 @@ function App() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {
-      console.log('[useEffect] Canvas not found!');
-      return;
-    }
-    console.log('[useEffect] Canvas found, setting up event listeners');
+    if (!canvas) return;
 
     const handleMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -381,28 +377,18 @@ function App() {
     };
 
     const handleMouseClick = (e) => {
-      console.log('[handleMouseClick] TRIGGERED - click event received');
       const state = useGame.getState();
-      console.log('[handleMouseClick] selectedBuilding:', state.selectedBuilding);
       if (!state.selectedBuilding) return;
 
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) / (canvas.width / 50));
       const y = Math.floor((e.clientY - rect.top) / (canvas.height / 50));
-      console.log('[handleMouseClick] coords:', x, y, 'grid value:', state.grid[y]?.[x]);
 
       if (x < 0 || x >= 50 || y < 0 || y >= 50) return;
-      if (state.grid[y][x] !== null) {
-        console.log('[handleMouseClick] tile occupied by:', state.grid[y][x]);
-        return;
-      }
+      if (state.grid[y][x] !== null) return;
 
       const buildingData = entitiesData[state.selectedBuilding];
-      console.log('[handleMouseClick] buildingData:', buildingData);
-      if (!buildingData || !buildingData.cost) {
-        console.log('[handleMouseClick] BLOCKED: no buildingData or cost');
-        return;
-      }
+      if (!buildingData || !buildingData.cost) return;
 
       // Apply cost multiplier from modifier
       const costMultiplier = state.activeModifier && modifiersData[state.activeModifier]?.effects?.costMultiplier || 1;
@@ -410,12 +396,8 @@ function App() {
       const canAfford = Object.entries(buildingData.cost).every(
         ([resource, amount]) => (state.resources[resource] || 0) >= Math.ceil(amount * costMultiplier)
       );
-      console.log('[handleMouseClick] canAfford:', canAfford, 'resources:', state.resources);
 
-      if (!canAfford) {
-        console.log('[handleMouseClick] BLOCKED: cannot afford');
-        return;
-      }
+      if (!canAfford) return;
 
       Object.entries(buildingData.cost).forEach(([resource, amount]) => {
         state.addResource(resource, -Math.ceil(amount * costMultiplier));
@@ -480,7 +462,6 @@ function App() {
       }
 
       state.spawn(entity);
-      console.log('[handleMouseClick] SUCCESS: placed', state.selectedBuilding, 'at', x, y);
     };
 
     const handleKeyDown = (e) => {
@@ -492,13 +473,11 @@ function App() {
       }
     };
 
-    console.log('[useEffect] Attaching event listeners to canvas', canvas);
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('click', handleMouseClick);
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      console.log('[useEffect] Removing event listeners from canvas');
       canvas.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('click', handleMouseClick);
       window.removeEventListener('keydown', handleKeyDown);
