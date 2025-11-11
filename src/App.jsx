@@ -421,6 +421,84 @@ function App() {
     carGarage4.add('Equipment', {});
     useGame.getState().spawn(carGarage4);
 
+    // ========== CONVEYOR NETWORK - CONNECTING PRODUCTION TO STORAGE ========== //
+
+    // From iron refineries (21-22, 21-22) -> storage at (23,24)
+    const conv1 = new Entity('conveyor1', 'conveyor');
+    conv1.x = 21;
+    conv1.y = 23;
+    conv1.add('Health', { current: 50, max: 50 });
+    conv1.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
+    conv1.add('Power', { production: 0, consumption: 1, connected: false });
+    conv1.add('Equipment', {});
+    useGame.getState().spawn(conv1);
+
+    const conv2 = new Entity('conveyor2', 'conveyor');
+    conv2.x = 22;
+    conv2.y = 23;
+    conv2.add('Health', { current: 50, max: 50 });
+    conv2.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: 1 } });
+    conv2.add('Power', { production: 0, consumption: 1, connected: false });
+    conv2.add('Equipment', {});
+    useGame.getState().spawn(conv2);
+
+    const conv3 = new Entity('conveyor3', 'conveyor');
+    conv3.x = 22;
+    conv3.y = 24;
+    conv3.add('Health', { current: 50, max: 50 });
+    conv3.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
+    conv3.add('Power', { production: 0, consumption: 1, connected: false });
+    conv3.add('Equipment', {});
+    useGame.getState().spawn(conv3);
+
+    // From copper refineries (26-27, 21-22) -> storage at (25,24)
+    const conv4 = new Entity('conveyor4', 'conveyor');
+    conv4.x = 27;
+    conv4.y = 23;
+    conv4.add('Health', { current: 50, max: 50 });
+    conv4.add('Conveyor', { items: [], speed: 1, dir: { x: -1, y: 0 } });
+    conv4.add('Power', { production: 0, consumption: 1, connected: false });
+    conv4.add('Equipment', {});
+    useGame.getState().spawn(conv4);
+
+    const conv5 = new Entity('conveyor5', 'conveyor');
+    conv5.x = 26;
+    conv5.y = 23;
+    conv5.add('Health', { current: 50, max: 50 });
+    conv5.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: 1 } });
+    conv5.add('Power', { production: 0, consumption: 1, connected: false });
+    conv5.add('Equipment', {});
+    useGame.getState().spawn(conv5);
+
+    const conv6 = new Entity('conveyor6', 'conveyor');
+    conv6.x = 26;
+    conv6.y = 24;
+    conv6.add('Health', { current: 50, max: 50 });
+    conv6.add('Conveyor', { items: [], speed: 1, dir: { x: -1, y: 0 } });
+    conv6.add('Power', { production: 0, consumption: 1, connected: false });
+    conv6.add('Equipment', {});
+    useGame.getState().spawn(conv6);
+
+    // From gear assemblers (21-22, 26-27) -> storage at (24,25)
+    const conv7 = new Entity('conveyor7', 'conveyor');
+    conv7.x = 22;
+    conv7.y = 25;
+    conv7.add('Health', { current: 50, max: 50 });
+    conv7.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } });
+    conv7.add('Power', { production: 0, consumption: 1, connected: false });
+    conv7.add('Equipment', {});
+    useGame.getState().spawn(conv7);
+
+    // From circuit assemblers (26-27, 26) -> storage at (24,25)
+    const conv8 = new Entity('conveyor8', 'conveyor');
+    conv8.x = 25;
+    conv8.y = 26;
+    conv8.add('Health', { current: 50, max: 50 });
+    conv8.add('Conveyor', { items: [], speed: 1, dir: { x: -1, y: 0 } });
+    conv8.add('Power', { production: 0, consumption: 1, connected: false });
+    conv8.add('Equipment', {});
+    useGame.getState().spawn(conv8);
+
     // ========== PERIMETER DEFENSES - TURRETS ON THE OUTSIDE ========== //
 
     // NORTH PERIMETER TURRETS (y=19)
