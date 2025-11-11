@@ -20,6 +20,10 @@ export class CombatSystem {
             combat.timer = 0;
 
             if (targetHealth.current <= 0) {
+              if (target.type === 'enemy') {
+                state.addResource('iron', 5);
+                state.addResource('copper', 2);
+              }
               entitiesToRemove.push(target.id);
             }
           }

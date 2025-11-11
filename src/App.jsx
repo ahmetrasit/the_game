@@ -1,12 +1,19 @@
 import { useEffect, useRef } from 'react';
 import { useGame } from './core/Game';
 import { Entity } from './core/Entity';
+import { PathfindingSystem } from './systems/PathfindingSystem';
+import { MovementSystem } from './systems/MovementSystem';
+import { WaveSystem } from './systems/WaveSystem';
 import { CombatSystem } from './systems/CombatSystem';
 import { RenderSystem } from './systems/RenderSystem';
 
 class GameLoop {
   constructor(canvas) {
+    this.waveSystem = new WaveSystem();
     this.systems = [
+      this.waveSystem,
+      new PathfindingSystem(),
+      new MovementSystem(),
       new CombatSystem(),
       new RenderSystem(canvas)
     ];
@@ -47,12 +54,64 @@ class GameLoop {
   getFPS() {
     return this.fps;
   }
+
+  getWaveNumber() {
+    return this.waveSystem.getWaveNumber();
+  }
+
+  getNextWaveTimer() {
+    return (10 - this.waveSystem.timer).toFixed(1);
+  }
 }
 
 function App() {
   const canvasRef = useRef(null);
   const gameRef = useRef(null);
   const { resources, entities, gameTime } = useGame();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (gameRef.current) {
+        useGame.setState({});
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const spawnTestEnemies = (count) => {
+      for (let i = 0; i < count; i++) {
+        const e = new Entity(`test_e${Date.now()}_${i}`, 'enemy');
+        const edge = Math.floor(Math.random() * 4);
+        if (edge === 0) {
+          e.x = Math.floor(Math.random() * 50);
+          e.y = 0;
+        } else if (edge === 1) {
+          e.x = 49;
+          e.y = Math.floor(Math.random() * 50);
+        } else if (edge === 2) {
+          e.x = Math.floor(Math.random() * 50);
+          e.y = 49;
+        } else {
+          e.x = 0;
+          e.y = Math.floor(Math.random() * 50);
+        }
+        e.add('Health', { current: 50, max: 50 });
+        e.add('Movement', { speed: 2, target: { x: 25, y: 25 }, path: null });
+        e.add('Equipment', {});
+        useGame.getState().spawn(e);
+      }
+    };
+
+    const handleKeyPress = (event) => {
+      if (event.key === '1') spawnTestEnemies(1);
+      if (event.key === '2') spawnTestEnemies(20);
+      if (event.key === '3') spawnTestEnemies(100);
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   useEffect(() => {
     if (!canvasRef.current || gameRef.current) return;
@@ -66,13 +125,8 @@ function App() {
     turret.y = 25;
     turret.add('Health', { current: 300, max: 300 });
     turret.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
+    turret.add('Equipment', {});
     useGame.getState().spawn(turret);
-
-    const scout = new Entity('e1', 'enemy');
-    scout.x = 30;
-    scout.y = 30;
-    scout.add('Health', { current: 50, max: 50 });
-    useGame.getState().spawn(scout);
   }, []);
 
   return (
@@ -82,8 +136,13 @@ function App() {
         <span style={{ marginRight: '20px' }}>Iron: {resources.iron}</span>
         <span style={{ marginRight: '20px' }}>Copper: {resources.copper}</span>
         <span style={{ marginRight: '20px' }}>Entities: {entities.size}</span>
+        <span style={{ marginRight: '20px' }}>Wave: {gameRef.current?.getWaveNumber() || 0}</span>
+        <span style={{ marginRight: '20px' }}>Next: {gameRef.current?.getNextWaveTimer() || '10.0'}s</span>
         <span style={{ marginRight: '20px' }}>Time: {gameTime.toFixed(1)}s</span>
         <span>FPS: {gameRef.current?.getFPS() || 0}</span>
+      </div>
+      <div style={{ marginBottom: '10px', fontSize: '12px', color: '#888' }}>
+        Test Controls: Press [1] spawn 1 enemy | [2] spawn 20 enemies | [3] spawn 100 enemies
       </div>
       <canvas
         ref={canvasRef}
