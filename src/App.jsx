@@ -568,6 +568,8 @@ function App() {
     let draggedBuilding = null;
     let dragStartX = null;
     let dragStartY = null;
+    let isRightClickHeld = false;
+    let lastDeletedTile = null;
 
     const handleMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -576,6 +578,40 @@ function App() {
 
       if (x >= 0 && x < 50 && y >= 0 && y < 50 && renderSystemRef.current) {
         renderSystemRef.current.setHoverTile(x, y);
+      }
+
+      // Handle deleting while right-click is held
+      if (isRightClickHeld && x >= 0 && x < 50 && y >= 0 && y < 50) {
+        const tileKey = `${x},${y}`;
+
+        // Only delete if we haven't deleted this tile yet in this drag
+        if (lastDeletedTile !== tileKey) {
+          const state = useGame.getState();
+          const buildingId = state.grid[y][x];
+
+          if (buildingId) {
+            const building = state.entities.get(buildingId);
+            if (building && (building.type === 'building' || building.type === 'conveyor')) {
+              // Get building type from ID
+              const buildingType = building.id.split('_')[0];
+              const buildingData = entitiesData[buildingType];
+
+              if (buildingData && buildingData.cost) {
+                // Refund 65-80% of resources
+                const refundPercent = 0.65 + Math.random() * 0.15;
+
+                Object.entries(buildingData.cost).forEach(([resource, amount]) => {
+                  const refund = Math.floor(amount * refundPercent);
+                  state.addResource(resource, refund);
+                });
+              }
+
+              // Remove the building
+              state.remove(buildingId);
+              lastDeletedTile = tileKey;
+            }
+          }
+        }
       }
 
       // Handle dragging building
@@ -621,31 +657,11 @@ function App() {
 
       if (x < 0 || x >= 50 || y < 0 || y >= 50) return;
 
-      // Right click - delete building
+      // Right click - start delete mode (hold to delete)
       if (e.button === 2) {
         e.preventDefault();
-        const buildingId = state.grid[y][x];
-        if (!buildingId) return;
-
-        const building = state.entities.get(buildingId);
-        if (!building || building.type !== 'building' && building.type !== 'conveyor') return;
-
-        // Get building type from ID
-        const buildingType = building.id.split('_')[0];
-        const buildingData = entitiesData[buildingType];
-
-        if (buildingData && buildingData.cost) {
-          // Refund 65-80% of resources
-          const refundPercent = 0.65 + Math.random() * 0.15; // Random between 65-80%
-
-          Object.entries(buildingData.cost).forEach(([resource, amount]) => {
-            const refund = Math.floor(amount * refundPercent);
-            state.addResource(resource, refund);
-          });
-        }
-
-        // Remove the building
-        state.remove(buildingId);
+        isRightClickHeld = true;
+        lastDeletedTile = null; // Reset so we can delete the first building
         return;
       }
 
@@ -683,6 +699,12 @@ function App() {
       draggedBuilding = null;
       dragStartX = null;
       dragStartY = null;
+
+      // Release right-click delete mode
+      if (e.button === 2) {
+        isRightClickHeld = false;
+        lastDeletedTile = null;
+      }
     };
 
     const handleContextMenu = (e) => {
