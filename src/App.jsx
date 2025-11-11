@@ -205,6 +205,62 @@ function App() {
     copperRefinery.add('Equipment', {});
     useGame.getState().spawn(copperRefinery);
 
+    // Conveyors for ironRefinery2
+    const conveyor3 = new Entity('conveyor3', 'conveyor');
+    conveyor3.x = 21;
+    conveyor3.y = 22;
+    conveyor3.add('Health', { current: 50, max: 50 });
+    conveyor3.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } }); // going up
+    conveyor3.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor3.add('Equipment', {});
+    useGame.getState().spawn(conveyor3);
+
+    const conveyor4 = new Entity('conveyor4', 'conveyor');
+    conveyor4.x = 21;
+    conveyor4.y = 21;
+    conveyor4.add('Health', { current: 50, max: 50 });
+    conveyor4.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } }); // going up
+    conveyor4.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor4.add('Equipment', {});
+    useGame.getState().spawn(conveyor4);
+
+    const conveyor5 = new Entity('conveyor5', 'conveyor');
+    conveyor5.x = 21;
+    conveyor5.y = 20;
+    conveyor5.add('Health', { current: 50, max: 50 });
+    conveyor5.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } }); // going right
+    conveyor5.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor5.add('Equipment', {});
+    useGame.getState().spawn(conveyor5);
+
+    // Conveyors for copperRefinery
+    const conveyor6 = new Entity('conveyor6', 'conveyor');
+    conveyor6.x = 23;
+    conveyor6.y = 22;
+    conveyor6.add('Health', { current: 50, max: 50 });
+    conveyor6.add('Conveyor', { items: [], speed: 1, dir: { x: 1, y: 0 } }); // going right
+    conveyor6.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor6.add('Equipment', {});
+    useGame.getState().spawn(conveyor6);
+
+    const conveyor7 = new Entity('conveyor7', 'conveyor');
+    conveyor7.x = 24;
+    conveyor7.y = 22;
+    conveyor7.add('Health', { current: 50, max: 50 });
+    conveyor7.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } }); // going up
+    conveyor7.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor7.add('Equipment', {});
+    useGame.getState().spawn(conveyor7);
+
+    const conveyor8 = new Entity('conveyor8', 'conveyor');
+    conveyor8.x = 24;
+    conveyor8.y = 21;
+    conveyor8.add('Health', { current: 50, max: 50 });
+    conveyor8.add('Conveyor', { items: [], speed: 1, dir: { x: 0, y: -1 } }); // going up to conveyor2
+    conveyor8.add('Power', { production: 0, consumption: 1, connected: false });
+    conveyor8.add('Equipment', {});
+    useGame.getState().spawn(conveyor8);
+
     // Laser turret 1
     const laserTurret1 = new Entity('laserTurret1', 'building');
     laserTurret1.x = 23;
