@@ -4,7 +4,7 @@ export class RenderSystem {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.tileSize = 32;
+    this.tileSize = canvas.width / 50; // Dynamic tile size based on canvas width
   }
 
   update() {
@@ -43,15 +43,34 @@ export class RenderSystem {
     const x = entity.x * this.tileSize;
     const y = entity.y * this.tileSize;
 
-    if (entity.type === 'enemy') {
-      this.ctx.fillStyle = '#ff4444';
-    } else if (entity.type === 'building') {
-      this.ctx.fillStyle = '#4444ff';
-    } else {
-      this.ctx.fillStyle = '#888';
-    }
+    if (entity.type === 'projectile') {
+      // Draw projectile as a bright yellow circle
+      const radius = this.tileSize / 5; // Scale with tile size
+      this.ctx.fillStyle = '#ffff00';
+      this.ctx.beginPath();
+      this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
+      this.ctx.fill();
 
-    this.ctx.fillRect(x + 2, y + 2, this.tileSize - 4, this.tileSize - 4);
+      // Add glow effect
+      this.ctx.shadowBlur = radius * 2;
+      this.ctx.shadowColor = '#ffff00';
+      this.ctx.beginPath();
+      this.ctx.arc(x + this.tileSize / 2, y + this.tileSize / 2, radius, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.shadowBlur = 0;
+    } else if (entity.type === 'enemy') {
+      const padding = this.tileSize / 16; // Scale padding with tile size
+      this.ctx.fillStyle = '#ff4444';
+      this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+    } else if (entity.type === 'building') {
+      const padding = this.tileSize / 16;
+      this.ctx.fillStyle = '#4444ff';
+      this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+    } else {
+      const padding = this.tileSize / 16;
+      this.ctx.fillStyle = '#888';
+      this.ctx.fillRect(x + padding, y + padding, this.tileSize - padding * 2, this.tileSize - padding * 2);
+    }
   }
 
   drawHealthBar(entity) {
@@ -63,13 +82,15 @@ export class RenderSystem {
 
     const x = entity.x * this.tileSize;
     const y = entity.y * this.tileSize;
-    const barWidth = this.tileSize - 4;
-    const barHeight = 4;
+    const padding = this.tileSize / 16;
+    const barWidth = this.tileSize - padding * 2;
+    const barHeight = this.tileSize / 8;
+    const offset = this.tileSize / 5;
 
     this.ctx.fillStyle = '#333';
-    this.ctx.fillRect(x + 2, y - 6, barWidth, barHeight);
+    this.ctx.fillRect(x + padding, y - offset, barWidth, barHeight);
 
     this.ctx.fillStyle = ratio > 0.5 ? '#4ade80' : ratio > 0.25 ? '#fbbf24' : '#ef4444';
-    this.ctx.fillRect(x + 2, y - 6, barWidth * ratio, barHeight);
+    this.ctx.fillRect(x + padding, y - offset, barWidth * ratio, barHeight);
   }
 }
