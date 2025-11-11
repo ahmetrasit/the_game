@@ -1,6 +1,10 @@
 import { useGame } from '../core/Game';
 
 export class MovementSystem {
+  constructor() {
+    this.stuckTracking = new Map();
+  }
+
   calculateSeparation(entity, entities) {
     let separationX = 0;
     let separationY = 0;
@@ -55,7 +59,38 @@ export class MovementSystem {
   update(dt) {
     const state = useGame.getState();
     const entitiesToUpdate = [];
+    const entitiesToDespawn = [];
 
+    // Check for stuck enemies
+    state.entities.forEach(e => {
+      if (e.type !== 'enemy') return;
+
+      const posKey = `${Math.floor(e.x * 10)},${Math.floor(e.y * 10)}`;
+
+      if (!this.stuckTracking.has(e.id)) {
+        this.stuckTracking.set(e.id, { position: posKey, time: 0 });
+      }
+
+      const tracked = this.stuckTracking.get(e.id);
+
+      if (tracked.position === posKey) {
+        tracked.time += dt;
+        if (tracked.time >= 5) {
+          entitiesToDespawn.push(e.id);
+        }
+      } else {
+        tracked.position = posKey;
+        tracked.time = 0;
+      }
+    });
+
+    // Remove stuck enemies
+    entitiesToDespawn.forEach(id => {
+      state.remove(id);
+      this.stuckTracking.delete(id);
+    });
+
+    // Move enemies
     state.entities.forEach(e => {
       const m = e.get('Movement');
       if (!m) return;
