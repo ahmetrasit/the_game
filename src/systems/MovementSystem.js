@@ -159,6 +159,9 @@ export class MovementSystem {
       const newGrid = state.grid.map(row => [...row]);
 
       entitiesToUpdate.forEach(({ entity, oldX, oldY }) => {
+        // Only update grid for buildings and conveyors (not enemies or other mobile entities)
+        if (entity.type !== 'building' && entity.type !== 'conveyor') return;
+
         if (oldX >= 0 && oldX < 50 && oldY >= 0 && oldY < 50) {
           if (newGrid[oldY][oldX] === entity.id) {
             newGrid[oldY][oldX] = null;
