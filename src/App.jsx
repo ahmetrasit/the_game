@@ -142,6 +142,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!gameStarted) return; // Wait until game starts
     if (!canvasRef.current || gameRef.current) return;
 
     const game = new GameLoop(canvasRef.current);
@@ -349,7 +350,7 @@ function App() {
     });
     droneBay.add('Equipment', {});
     useGame.getState().spawn(droneBay);
-  }, []);
+  }, [gameStarted]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
