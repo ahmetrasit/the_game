@@ -31,8 +31,19 @@ export class ProjectileSystem {
 
             if (targetHealth.current <= 0) {
               if (target.type === 'enemy') {
+                // Always drop iron and copper
                 state.addResource('iron', 5);
                 state.addResource('copper', 2);
+
+                // 10% chance to drop gears
+                if (Math.random() < 0.1) {
+                  state.addResource('gears', 1);
+                }
+
+                // 5% chance to drop circuits
+                if (Math.random() < 0.05) {
+                  state.addResource('circuits', 1);
+                }
               }
               entitiesToRemove.push(target.id);
             }

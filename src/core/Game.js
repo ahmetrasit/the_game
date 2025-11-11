@@ -2,7 +2,15 @@ import { create } from 'zustand';
 
 export const useGame = create((set, get) => ({
   entities: new Map(),
-  resources: { iron: 100, copper: 50 },
+  resources: {
+    iron: 500,
+    copper: 300,
+    ironPlates: 100,
+    copperPlates: 50,
+    gears: 20,
+    circuits: 10,
+    advancedCircuits: 5
+  },
   grid: Array(50).fill().map(() => Array(50).fill(null)),
   isPaused: false,
   gameTime: 0,
