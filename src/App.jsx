@@ -364,6 +364,281 @@ function App() {
     carGarage.add('Health', { current: 250, max: 250 });
     carGarage.add('Equipment', {});
     useGame.getState().spawn(carGarage);
+
+    // ========== EXPANDED STARTING FACTORY ========== //
+
+    // Additional Generators (3 more for total 5)
+    const generator3 = new Entity('generator3', 'building');
+    generator3.x = 26;
+    generator3.y = 20;
+    generator3.add('Health', { current: 150, max: 150 });
+    generator3.add('Power', { production: 20, consumption: 0, connected: true });
+    generator3.add('Equipment', {});
+    useGame.getState().spawn(generator3);
+
+    const generator4 = new Entity('generator4', 'building');
+    generator4.x = 18;
+    generator4.y = 22;
+    generator4.add('Health', { current: 150, max: 150 });
+    generator4.add('Power', { production: 20, consumption: 0, connected: true });
+    generator4.add('Equipment', {});
+    useGame.getState().spawn(generator4);
+
+    const generator5 = new Entity('generator5', 'building');
+    generator5.x = 30;
+    generator5.y = 22;
+    generator5.add('Health', { current: 150, max: 150 });
+    generator5.add('Power', { production: 20, consumption: 0, connected: true });
+    generator5.add('Equipment', {});
+    useGame.getState().spawn(generator5);
+
+    // Additional Iron Refineries (2 more for total 4)
+    const ironRefinery3 = new Entity('ironRefinery3', 'building');
+    ironRefinery3.x = 18;
+    ironRefinery3.y = 24;
+    ironRefinery3.add('Health', { current: 200, max: 200 });
+    ironRefinery3.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
+    ironRefinery3.add('Power', { production: 0, consumption: 5, connected: false });
+    ironRefinery3.add('Equipment', {});
+    useGame.getState().spawn(ironRefinery3);
+
+    const ironRefinery4 = new Entity('ironRefinery4', 'building');
+    ironRefinery4.x = 18;
+    ironRefinery4.y = 26;
+    ironRefinery4.add('Health', { current: 200, max: 200 });
+    ironRefinery4.add('Production', { recipe: 'ironPlates', time: 2, progress: 0 });
+    ironRefinery4.add('Power', { production: 0, consumption: 5, connected: false });
+    ironRefinery4.add('Equipment', {});
+    useGame.getState().spawn(ironRefinery4);
+
+    // Additional Copper Refineries (2 more for total 3)
+    const copperRefinery2 = new Entity('copperRefinery2', 'building');
+    copperRefinery2.x = 20;
+    copperRefinery2.y = 24;
+    copperRefinery2.add('Health', { current: 200, max: 200 });
+    copperRefinery2.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
+    copperRefinery2.add('Power', { production: 0, consumption: 5, connected: false });
+    copperRefinery2.add('Equipment', {});
+    useGame.getState().spawn(copperRefinery2);
+
+    const copperRefinery3 = new Entity('copperRefinery3', 'building');
+    copperRefinery3.x = 20;
+    copperRefinery3.y = 26;
+    copperRefinery3.add('Health', { current: 200, max: 200 });
+    copperRefinery3.add('Production', { recipe: 'copperPlates', time: 2, progress: 0 });
+    copperRefinery3.add('Power', { production: 0, consumption: 5, connected: false });
+    copperRefinery3.add('Equipment', {});
+    useGame.getState().spawn(copperRefinery3);
+
+    // Assemblers for Gears (3 total)
+    const assembler1 = new Entity('assembler1', 'building');
+    assembler1.x = 22;
+    assembler1.y = 24;
+    assembler1.add('Health', { current: 250, max: 250 });
+    assembler1.add('Production', { recipe: 'gears', time: 1, progress: 0 });
+    assembler1.add('Power', { production: 0, consumption: 10, connected: false });
+    assembler1.add('Equipment', {});
+    useGame.getState().spawn(assembler1);
+
+    const assembler2 = new Entity('assembler2', 'building');
+    assembler2.x = 22;
+    assembler2.y = 26;
+    assembler2.add('Health', { current: 250, max: 250 });
+    assembler2.add('Production', { recipe: 'gears', time: 1, progress: 0 });
+    assembler2.add('Power', { production: 0, consumption: 10, connected: false });
+    assembler2.add('Equipment', {});
+    useGame.getState().spawn(assembler2);
+
+    const assembler3 = new Entity('assembler3', 'building');
+    assembler3.x = 24;
+    assembler3.y = 25;
+    assembler3.add('Health', { current: 250, max: 250 });
+    assembler3.add('Production', { recipe: 'gears', time: 1, progress: 0 });
+    assembler3.add('Power', { production: 0, consumption: 10, connected: false });
+    assembler3.add('Equipment', {});
+    useGame.getState().spawn(assembler3);
+
+    // Advanced Assemblers for Circuits (2 total)
+    const advancedAssembler1 = new Entity('advancedAssembler1', 'building');
+    advancedAssembler1.x = 26;
+    advancedAssembler1.y = 24;
+    advancedAssembler1.add('Health', { current: 300, max: 300 });
+    advancedAssembler1.add('Production', { recipe: 'circuits', time: 3, progress: 0 });
+    advancedAssembler1.add('Power', { production: 0, consumption: 15, connected: false });
+    advancedAssembler1.add('Equipment', {});
+    useGame.getState().spawn(advancedAssembler1);
+
+    const advancedAssembler2 = new Entity('advancedAssembler2', 'building');
+    advancedAssembler2.x = 26;
+    advancedAssembler2.y = 26;
+    advancedAssembler2.add('Health', { current: 300, max: 300 });
+    advancedAssembler2.add('Production', { recipe: 'circuits', time: 3, progress: 0 });
+    advancedAssembler2.add('Power', { production: 0, consumption: 15, connected: false });
+    advancedAssembler2.add('Equipment', {});
+    useGame.getState().spawn(advancedAssembler2);
+
+    // Additional Storage (2 more for total 3)
+    const storage2 = new Entity('storage2', 'building');
+    storage2.x = 28;
+    storage2.y = 24;
+    storage2.add('Health', { current: 100, max: 100 });
+    storage2.add('Equipment', {});
+    useGame.getState().spawn(storage2);
+
+    const storage3 = new Entity('storage3', 'building');
+    storage3.x = 28;
+    storage3.y = 26;
+    storage3.add('Health', { current: 100, max: 100 });
+    storage3.add('Equipment', {});
+    useGame.getState().spawn(storage3);
+
+    // Additional Drone Bays (2 more for total 3)
+    const droneBay2 = new Entity('droneBay2', 'building');
+    droneBay2.x = 28;
+    droneBay2.y = 22;
+    droneBay2.add('Health', { current: 300, max: 300 });
+    droneBay2.add('DroneBay', { productionTime: 15, productionProgress: 0 });
+    droneBay2.add('Equipment', {});
+    useGame.getState().spawn(droneBay2);
+
+    const droneBay3 = new Entity('droneBay3', 'building');
+    droneBay3.x = 30;
+    droneBay3.y = 24;
+    droneBay3.add('Health', { current: 300, max: 300 });
+    droneBay3.add('DroneBay', { productionTime: 15, productionProgress: 0 });
+    droneBay3.add('Equipment', {});
+    useGame.getState().spawn(droneBay3);
+
+    // Additional Car Garages (3 more for total 4)
+    const carGarage2 = new Entity('carGarage2', 'building');
+    carGarage2.x = 30;
+    carGarage2.y = 26;
+    carGarage2.add('Health', { current: 250, max: 250 });
+    carGarage2.add('Equipment', {});
+    useGame.getState().spawn(carGarage2);
+
+    const carGarage3 = new Entity('carGarage3', 'building');
+    carGarage3.x = 18;
+    carGarage3.y = 28;
+    carGarage3.add('Health', { current: 250, max: 250 });
+    carGarage3.add('Equipment', {});
+    useGame.getState().spawn(carGarage3);
+
+    const carGarage4 = new Entity('carGarage4', 'building');
+    carGarage4.x = 30;
+    carGarage4.y = 28;
+    carGarage4.add('Health', { current: 250, max: 250 });
+    carGarage4.add('Equipment', {});
+    useGame.getState().spawn(carGarage4);
+
+    // Additional Defensive Turrets (6 more)
+    const cannon1 = new Entity('cannon1', 'building');
+    cannon1.x = 21;
+    cannon1.y = 28;
+    cannon1.add('Health', { current: 400, max: 400 });
+    cannon1.add('Combat', { damage: 40, range: 6, fireRate: 0.5, timer: 0 });
+    cannon1.add('Equipment', {});
+    useGame.getState().spawn(cannon1);
+
+    const cannon2 = new Entity('cannon2', 'building');
+    cannon2.x = 29;
+    cannon2.y = 28;
+    cannon2.add('Health', { current: 400, max: 400 });
+    cannon2.add('Combat', { damage: 40, range: 6, fireRate: 0.5, timer: 0 });
+    cannon2.add('Equipment', {});
+    useGame.getState().spawn(cannon2);
+
+    const machineGun1 = new Entity('machineGun1', 'building');
+    machineGun1.x = 19;
+    machineGun1.y = 28;
+    machineGun1.add('Health', { current: 280, max: 280 });
+    machineGun1.add('Combat', { damage: 3, range: 7, fireRate: 5, timer: 0 });
+    machineGun1.add('Equipment', {});
+    useGame.getState().spawn(machineGun1);
+
+    const machineGun2 = new Entity('machineGun2', 'building');
+    machineGun2.x = 31;
+    machineGun2.y = 28;
+    machineGun2.add('Health', { current: 280, max: 280 });
+    machineGun2.add('Combat', { damage: 3, range: 7, fireRate: 5, timer: 0 });
+    machineGun2.add('Equipment', {});
+    useGame.getState().spawn(machineGun2);
+
+    const sniperTurret1 = new Entity('sniperTurret1', 'building');
+    sniperTurret1.x = 20;
+    sniperTurret1.y = 18;
+    sniperTurret1.add('Health', { current: 200, max: 200 });
+    sniperTurret1.add('Combat', { damage: 50, range: 15, fireRate: 0.33, timer: 0 });
+    sniperTurret1.add('Equipment', {});
+    useGame.getState().spawn(sniperTurret1);
+
+    const sniperTurret2 = new Entity('sniperTurret2', 'building');
+    sniperTurret2.x = 28;
+    sniperTurret2.y = 18;
+    sniperTurret2.add('Health', { current: 200, max: 200 });
+    sniperTurret2.add('Combat', { damage: 50, range: 15, fireRate: 0.33, timer: 0 });
+    sniperTurret2.add('Equipment', {});
+    useGame.getState().spawn(sniperTurret2);
+
+    // Additional regular turrets
+    const turret2 = new Entity('turret2', 'building');
+    turret2.x = 22;
+    turret2.y = 18;
+    turret2.add('Health', { current: 300, max: 300 });
+    turret2.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
+    turret2.add('Equipment', {});
+    useGame.getState().spawn(turret2);
+
+    const turret3 = new Entity('turret3', 'building');
+    turret3.x = 26;
+    turret3.y = 18;
+    turret3.add('Health', { current: 300, max: 300 });
+    turret3.add('Combat', { damage: 10, range: 8, fireRate: 1, timer: 0 });
+    turret3.add('Equipment', {});
+    useGame.getState().spawn(turret3);
+
+    // More walls for perimeter defense
+    const wall6 = new Entity('wall6', 'building');
+    wall6.x = 18;
+    wall6.y = 30;
+    wall6.add('Health', { current: 500, max: 500 });
+    wall6.add('Equipment', {});
+    useGame.getState().spawn(wall6);
+
+    const wall7 = new Entity('wall7', 'building');
+    wall7.x = 20;
+    wall7.y = 30;
+    wall7.add('Health', { current: 500, max: 500 });
+    wall7.add('Equipment', {});
+    useGame.getState().spawn(wall7);
+
+    const wall8 = new Entity('wall8', 'building');
+    wall8.x = 22;
+    wall8.y = 30;
+    wall8.add('Health', { current: 500, max: 500 });
+    wall8.add('Equipment', {});
+    useGame.getState().spawn(wall8);
+
+    const wall9 = new Entity('wall9', 'building');
+    wall9.x = 28;
+    wall9.y = 30;
+    wall9.add('Health', { current: 500, max: 500 });
+    wall9.add('Equipment', {});
+    useGame.getState().spawn(wall9);
+
+    const wall10 = new Entity('wall10', 'building');
+    wall10.x = 30;
+    wall10.y = 30;
+    wall10.add('Health', { current: 500, max: 500 });
+    wall10.add('Equipment', {});
+    useGame.getState().spawn(wall10);
+
+    const wall11 = new Entity('wall11', 'building');
+    wall11.x = 32;
+    wall11.y = 30;
+    wall11.add('Health', { current: 500, max: 500 });
+    wall11.add('Equipment', {});
+    useGame.getState().spawn(wall11);
   }, [gameStarted]);
 
   useEffect(() => {
