@@ -27,6 +27,38 @@
       "copper": 10
     }
   },
+  "copperRefinery": {
+    "hp": 200,
+    "recipe": "copperPlates",
+    "productionTime": 2,
+    "powerConsumption": 5,
+    "cost": {
+      "iron": 20,
+      "copper": 10
+    }
+  },
+  "assembler": {
+    "hp": 250,
+    "recipe": "gears",
+    "productionTime": 1,
+    "powerConsumption": 10,
+    "cost": {
+      "ironPlates": 20,
+      "copperPlates": 10,
+      "gears": 5
+    }
+  },
+  "advancedAssembler": {
+    "hp": 300,
+    "recipe": "circuits",
+    "productionTime": 3,
+    "powerConsumption": 15,
+    "cost": {
+      "ironPlates": 30,
+      "copperPlates": 20,
+      "circuits": 5
+    }
+  },
   "storage": {
     "hp": 100,
     "capacity": 1000,

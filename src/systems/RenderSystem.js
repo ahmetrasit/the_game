@@ -74,8 +74,10 @@ export class RenderSystem {
       const power = entity.get('Power');
       const isPowered = !power || power.connected;
 
-      if (entity.id.startsWith('refinery')) {
+      if (entity.id.startsWith('refinery') || entity.id.startsWith('copperRefinery')) {
         this.ctx.fillStyle = isPowered ? '#ff8800' : '#662200';
+      } else if (entity.id.startsWith('assembler') || entity.id.startsWith('advancedAssembler')) {
+        this.ctx.fillStyle = isPowered ? '#00aaff' : '#004466';
       } else if (entity.id.startsWith('generator')) {
         this.ctx.fillStyle = '#ffff00';
       } else if (entity.id.startsWith('storage')) {
@@ -121,7 +123,10 @@ export class RenderSystem {
           this.ctx.fillStyle = item.type === 'iron' ? '#888' :
                                item.type === 'copper' ? '#ff8844' :
                                item.type === 'ironPlates' ? '#aaa' :
-                               item.type === 'copperPlates' ? '#ffaa66' : '#fff';
+                               item.type === 'copperPlates' ? '#ffaa66' :
+                               item.type === 'gears' ? '#cccccc' :
+                               item.type === 'circuits' ? '#00ff00' :
+                               item.type === 'advancedCircuits' ? '#00ffff' : '#fff';
 
           this.ctx.fillRect(itemX + this.tileSize / 2 - itemSize / 2,
                            itemY + this.tileSize / 2 - itemSize / 2,
@@ -167,8 +172,10 @@ export class RenderSystem {
 
     if (buildingType === 'turret') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#4444ff';
-    } else if (buildingType === 'refinery') {
+    } else if (buildingType === 'refinery' || buildingType === 'copperRefinery') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ff8800';
+    } else if (buildingType === 'assembler' || buildingType === 'advancedAssembler') {
+      this.ctx.fillStyle = isOccupied ? '#ff0000' : '#00aaff';
     } else if (buildingType === 'generator') {
       this.ctx.fillStyle = isOccupied ? '#ff0000' : '#ffff00';
     } else if (buildingType === 'storage') {

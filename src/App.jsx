@@ -235,7 +235,8 @@ function App() {
           fireRate: buildingData.fireRate,
           timer: 0
         });
-      } else if (state.selectedBuilding === 'refinery') {
+      } else if (state.selectedBuilding === 'refinery' || state.selectedBuilding === 'copperRefinery' ||
+                 state.selectedBuilding === 'assembler' || state.selectedBuilding === 'advancedAssembler') {
         entity.add('Production', {
           recipe: buildingData.recipe,
           time: buildingData.productionTime,
@@ -306,10 +307,15 @@ function App() {
     }}>
       <h1 style={{ margin: '10px 0', textAlign: 'center' }}>Tower Defense Factory</h1>
       <div style={{ marginBottom: '10px', fontSize: '14px', textAlign: 'center' }}>
-        <span style={{ marginRight: '20px' }}>Iron: {resources.iron || 0}</span>
-        <span style={{ marginRight: '20px' }}>Copper: {resources.copper || 0}</span>
-        <span style={{ marginRight: '20px' }}>Iron Plates: {resources.ironPlates || 0}</span>
-        <span style={{ marginRight: '20px' }}>Copper Plates: {resources.copperPlates || 0}</span>
+        <span style={{ marginRight: '15px' }}>Iron: {resources.iron || 0}</span>
+        <span style={{ marginRight: '15px' }}>Copper: {resources.copper || 0}</span>
+        <span style={{ marginRight: '15px' }}>IPlates: {resources.ironPlates || 0}</span>
+        <span style={{ marginRight: '15px' }}>CPlates: {resources.copperPlates || 0}</span>
+        <span style={{ marginRight: '15px' }}>Gears: {resources.gears || 0}</span>
+        <span style={{ marginRight: '15px' }}>Circuits: {resources.circuits || 0}</span>
+        <span style={{ marginRight: '15px' }}>AdvCircuits: {resources.advancedCircuits || 0}</span>
+      </div>
+      <div style={{ marginBottom: '10px', fontSize: '12px', textAlign: 'center', color: '#888' }}>
         <span style={{ marginRight: '20px' }}>Entities: {entities.size}</span>
         <span style={{ marginRight: '20px' }}>Wave: {gameRef.current?.getWaveNumber() || 0}</span>
         <span style={{ marginRight: '20px' }}>Next: {gameRef.current?.getNextWaveTimer() || '10.0'}s</span>
@@ -355,55 +361,63 @@ function App() {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {['turret', 'refinery', 'generator', 'storage', 'conveyor'].map(type => {
+            {['turret', 'generator', 'storage', 'conveyor', 'refinery', 'copperRefinery', 'assembler', 'advancedAssembler'].map(type => {
               const data = entitiesData[type];
+              if (!data) return null;
+
               const isSelected = selectedBuilding === type;
               const canAfford = data.cost && Object.entries(data.cost).every(
                 ([resource, amount]) => (resources[resource] || 0) >= amount
               );
+
+              const getDisplayName = (t) => {
+                if (t === 'copperRefinery') return 'COPPER REFINERY';
+                if (t === 'advancedAssembler') return 'ADV ASSEMBLER';
+                return t.toUpperCase();
+              };
 
               return (
                 <button
                   key={type}
                   onClick={() => useGame.getState().selectBuilding(type)}
                   style={{
-                    padding: '10px',
+                    padding: '8px',
                     backgroundColor: isSelected ? '#444' : '#222',
                     border: `2px solid ${isSelected ? '#4ade80' : canAfford ? '#444' : '#883333'}`,
                     color: canAfford ? '#fff' : '#888',
                     cursor: canAfford ? 'pointer' : 'not-allowed',
                     textAlign: 'left',
-                    fontSize: '13px',
+                    fontSize: '11px',
                     fontFamily: 'monospace'
                   }}
                   disabled={!canAfford}
                 >
-                  <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                    {type.toUpperCase()}
+                  <div style={{ fontWeight: 'bold', marginBottom: '2px', fontSize: '12px' }}>
+                    {getDisplayName(type)}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#888' }}>
-                    Cost: {data.cost ? Object.entries(data.cost)
+                  <div style={{ fontSize: '10px', color: '#888' }}>
+                    {data.cost ? Object.entries(data.cost)
                       .map(([r, a]) => `${a} ${r}`)
-                      .join(', ') : 'None'}
+                      .join(', ') : 'Free'}
                   </div>
                   {type === 'turret' && (
-                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
-                      Dmg: {data.damage} | Range: {data.range} | Rate: {data.fireRate}/s
+                    <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                      Dmg:{data.damage} Rng:{data.range} Rate:{data.fireRate}/s
                     </div>
                   )}
-                  {type === 'refinery' && (
-                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
-                      Produces: {data.recipe} | Power: {data.powerConsumption}
+                  {(type === 'refinery' || type === 'copperRefinery' || type === 'assembler' || type === 'advancedAssembler') && (
+                    <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                      {data.recipe} | Pwr:{data.powerConsumption} | T:{data.productionTime}s
                     </div>
                   )}
                   {type === 'generator' && (
-                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
+                    <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
                       Power: +{data.powerProduction}
                     </div>
                   )}
                   {type === 'conveyor' && (
-                    <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
-                      Speed: {data.speed} | Power: {data.powerConsumption}
+                    <div style={{ fontSize: '9px', color: '#666', marginTop: '2px' }}>
+                      Spd:{data.speed} | Pwr:{data.powerConsumption}
                     </div>
                   )}
                 </button>

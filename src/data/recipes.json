@@ -8,5 +8,20 @@
     "inputs": [{"type": "copper", "amount": 3}],
     "outputs": [{"type": "copperPlates", "amount": 1}],
     "time": 2
+  },
+  "gears": {
+    "inputs": [{"type": "ironPlates", "amount": 2}],
+    "outputs": [{"type": "gears", "amount": 1}],
+    "time": 1
+  },
+  "circuits": {
+    "inputs": [{"type": "ironPlates", "amount": 1}, {"type": "copperPlates", "amount": 2}],
+    "outputs": [{"type": "circuits", "amount": 1}],
+    "time": 3
+  },
+  "advancedCircuits": {
+    "inputs": [{"type": "circuits", "amount": 2}, {"type": "copperPlates", "amount": 2}],
+    "outputs": [{"type": "advancedCircuits", "amount": 1}],
+    "time": 4
   }
 }
