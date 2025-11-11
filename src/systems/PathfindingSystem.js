@@ -29,8 +29,8 @@ export class PathfindingSystem {
       const cur = open.shift();
       const key = `${cur.x},${cur.y}`;
 
-      const distToGoal = Math.abs(cur.x - goal.x) + Math.abs(cur.y - goal.y);
-      if (distToGoal === 0 || distToGoal === 1) {
+      const distToGoal = Math.hypot(cur.x - goal.x, cur.y - goal.y);
+      if (distToGoal <= 1.5) {
         const path = [];
         let current = cur;
         let currentKey = key;
@@ -67,7 +67,7 @@ export class PathfindingSystem {
         if (cellOccupant && state.entities.get(cellOccupant)?.type === 'building') return;
 
         const g = cur.g + d.cost;
-        const h = Math.abs(n.x - goal.x) + Math.abs(n.y - goal.y);
+        const h = Math.hypot(n.x - goal.x, n.y - goal.y);
         n.g = g;
         n.f = g + h;
 
