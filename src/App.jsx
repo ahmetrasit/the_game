@@ -158,7 +158,7 @@ function App() {
 
     // ========== EXPANDED 5x5 STARTER FACTORY (23,24) to (28,27) ========== //
 
-    // ROW 24 - Top row: sniper, generator, gear assembler, storage, cannon
+    // ROW 24 - Top row: sniper, generator, gear assembler, storage, generator3
     const sniperTurret1 = new Entity('sniperTurret1', 'building');
     sniperTurret1.x = 23;
     sniperTurret1.y = 24;
@@ -191,13 +191,13 @@ function App() {
     storage1.add('Equipment', {});
     useGame.getState().spawn(storage1);
 
-    const cannon1 = new Entity('cannon1', 'building');
-    cannon1.x = 27;
-    cannon1.y = 24;
-    cannon1.add('Health', { current: 400, max: 400 });
-    cannon1.add('Combat', { damage: 40, range: 6, fireRate: 0.5, timer: 0 });
-    cannon1.add('Equipment', {});
-    useGame.getState().spawn(cannon1);
+    const generator3 = new Entity('generator3', 'building');
+    generator3.x = 27;
+    generator3.y = 24;
+    generator3.add('Health', { current: 150, max: 150 });
+    generator3.add('Power', { production: 20, consumption: 0, connected: true });
+    generator3.add('Equipment', {});
+    useGame.getState().spawn(generator3);
 
     // ROW 25 - Middle row: iron refinery2, laser turret, player turret (t1), drone bay, iron refinery3
     const ironRefinery2 = new Entity('ironRefinery2', 'building');
